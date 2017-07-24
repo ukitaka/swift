@@ -21,6 +21,8 @@
 #include "swift/Basic/StringExtras.h"
 #include "swift/ClangImporter/ClangModule.h"
 #include "llvm/Support/Compiler.h"
+#include <iostream>
+#include <string>
 
 using namespace swift;
 using namespace constraints;
@@ -4742,6 +4744,65 @@ ConstraintSystem::simplifyFixConstraint(Fix fix, Type type1, Type type2,
   llvm_unreachable("Unhandled FixKind in switch.");
 }
 
+std::string MY_getKindName(ConstraintKind kind) {
+    switch (kind) {
+        case ConstraintKind::Bind:
+            return "Bind";
+        case ConstraintKind::Equal:
+            return "Equal";
+        case ConstraintKind::BindParam:
+            return "BindParam";
+        case ConstraintKind::BindToPointerType:
+            return "BindToPointerType";
+        case ConstraintKind::Subtype:
+            return "Subtype";
+        case ConstraintKind::Conversion:
+            return "Conversion";
+        case ConstraintKind::BridgingConversion:
+            return "BridginConversion";
+        case ConstraintKind::ArgumentConversion:
+            return "ArgumentConversion";
+        case ConstraintKind::ArgumentTupleConversion:
+            return "ArgumentTupleConversion";
+        case ConstraintKind::OperatorArgumentTupleConversion:
+            return "OperatorArgumentTupleConversion";
+        case ConstraintKind::OperatorArgumentConversion:
+            return "OperatorArgumentConversion";
+        case ConstraintKind::ConformsTo:
+            return "ConformsTo";
+        case ConstraintKind::LiteralConformsTo:
+            return "LiteralConformsTo";
+        case ConstraintKind::CheckedCast:
+            return "CheckedCast";
+        case ConstraintKind::SelfObjectOfProtocol:
+            return "SelfObjectOfProtocol";
+        case ConstraintKind::ApplicableFunction:
+            return "ApplicableFunction";
+        case ConstraintKind::DynamicTypeOf:
+            return "DynamicTypeOf";
+        case ConstraintKind::BindOverload:
+            return "BindOverload";
+        case ConstraintKind::ValueMember:
+            return "ValueMember";
+        case ConstraintKind::UnresolvedValueMember:
+            return "UnresolvedValueMember";
+        case ConstraintKind::Defaultable:
+            return "Defaultable";
+        case ConstraintKind::Disjunction:
+            return "Disjunction";
+        case ConstraintKind::OptionalObject:
+            return "OptionalObject";
+        case ConstraintKind::EscapableFunctionOf:
+            return "EscapableFunctionOf";
+        case ConstraintKind::OpenedExistentialOf:
+            return "OpenedExistentialOf";
+        case ConstraintKind::KeyPathApplication:
+            return "KeyPathApplication";
+        case ConstraintKind::KeyPath:
+            return "KeyPath";
+    }
+}
+
 ConstraintSystem::SolutionKind
 ConstraintSystem::addConstraintImpl(ConstraintKind kind, Type first,
                                     Type second,
@@ -4749,6 +4810,11 @@ ConstraintSystem::addConstraintImpl(ConstraintKind kind, Type first,
                                     bool isFavored) {
   assert(first && "Missing first type");
   assert(second && "Missing second type");
+    
+    std::cout << "-CONSTRAINT---------------------------------" << std::endl;
+    std::cout << "FIRST:" << first.getString() << std::endl;
+    std::cout << "SECOND:" << second.getString() << std::endl;
+    std::cout << "KIND:" << MY_getKindName(kind) << std::endl;
 
   TypeMatchOptions subflags = TMF_GenerateConstraints;
   switch (kind) {
