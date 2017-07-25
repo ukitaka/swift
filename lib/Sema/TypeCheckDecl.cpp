@@ -48,6 +48,7 @@
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/ADT/Twine.h"
 #include "llvm/Support/Compiler.h"
+#include <iostream>
 
 using namespace swift;
 
@@ -3929,19 +3930,23 @@ public:
   //===--------------------------------------------------------------------===//
 
   void visitGenericTypeParamDecl(GenericTypeParamDecl *D) {
+    std::cout << "[DeclChecker][visitGenericTypeParamDecl]" << std::endl;
     llvm_unreachable("cannot reach here");
   }
   
   void visitImportDecl(ImportDecl *ID) {
+    std::cout << "[DeclChecker][visitImportDecl]" << std::endl;
     TC.checkDeclAttributesEarly(ID);
     TC.checkDeclAttributes(ID);
   }
 
   void visitOperatorDecl(OperatorDecl *OD) {
+    std::cout << "[DeclChecker][visitOperatorDecl]" << std::endl;
     TC.validateDecl(OD);
   }
 
   void visitPrecedenceGroupDecl(PrecedenceGroupDecl *PGD) {
+    std::cout << "[DeclChecker][visitPrecedenceGroupDecl]" << std::endl;
     TC.validateDecl(PGD);
   }
 
@@ -3950,6 +3955,7 @@ public:
   }
 
   void visitBoundVariable(VarDecl *VD) {
+    std::cout << "[DeclChecker][visitBoundVariable]" << std::endl;
     TC.validateDecl(VD);
     
     if (!VD->getType()->isMaterializable()) {
@@ -4058,10 +4064,26 @@ public:
 
 
   void visitBoundVars(Pattern *P) {
+    std::cout << "[DeclChecker][visitBoundVars]" << std::endl;
     P->forEachVariable([&] (VarDecl *VD) { this->visitBoundVariable(VD); });
   }
 
+    // MEMO: どうやらここっぽい
+    // 文法的には let や var の次にくるのは`pattern`
+    // let `pattern`
+    // var `pattern`
+    //
+    // pattern → wildcard-pattern­type-annotation­opt­
+    // pattern → identifier-pattern­type-annotation­opt­
+    // pattern → value-binding-pattern­
+    // pattern → tuple-pattern­type-annotation­opt­
+    // pattern → enum-case-pattern­
+    // pattern → optional-pattern­
+    // pattern → type-casting-pattern­
+    // pattern → expression-pattern­
+
   void visitPatternBindingDecl(PatternBindingDecl *PBD) {
+    std::cout << "[DeclChecker][visitPatternBindingDecl]" << std::endl;
     // Check all the pattern/init pairs in the PBD.
     validatePatternBindingEntries(TC, PBD);
 
@@ -4081,6 +4103,8 @@ public:
     if (!IsSecondPass) {
       for (unsigned i = 0, e = PBD->getNumPatternEntries(); i != e; ++i) {
         // Type check each VarDecl that this PatternBinding handles.
+        // MEMO: BoundはAssignと同義っぽい。以下は文法の説明から引用。
+        // the value 42 is bound (assigned) to the constant name someValue.
         visitBoundVars(PBD->getPattern(i));
 
         // If we have a type but no initializer, check whether the type is
@@ -4092,7 +4116,7 @@ public:
 
           // If we have a type-adjusting attribute (like ownership), apply it now.
           if (auto var = PBD->getSingleVar())
-            TC.checkTypeModifyingDeclAttributes(var);
+            TC.checkTypeModifyingDeclAttributes(var); // MEMO: !!!!!!!!!! ここTypeChekしてる
 
           // Decide whether we should suppress default initialization.
           if (isNeverDefaultInitializable(PBD->getPattern(i)))
@@ -4103,7 +4127,7 @@ public:
             // If we got a default initializer, install it and re-type-check it
             // to make sure it is properly coerced to the pattern type.
             PBD->setInit(i, defaultInit);
-            TC.typeCheckPatternBinding(PBD, i, /*skipApplyingSolution*/false);
+            TC.typeCheckPatternBinding(PBD, i, /*skipApplyingSolution*/false); // MEMO: !!!!!!!!!! ここTypeChekしてる
           }
         }
       }
@@ -4177,6 +4201,7 @@ public:
   }
 
   void visitSubscriptDecl(SubscriptDecl *SD) {
+    std::cout << "[DeclChecker][visitSubscriptDecl]" << std::endl;
     if (IsSecondPass) {
       checkAccessibility(TC, SD);
       return;
@@ -4282,6 +4307,7 @@ public:
   }
 
   void visitTypeAliasDecl(TypeAliasDecl *TAD) {
+    std::cout << "[DeclChecker][visitTypeAliasDecl]" << std::endl;
     TC.checkDeclAttributesEarly(TAD);
     TC.computeAccessibility(TAD);
 
@@ -4295,6 +4321,7 @@ public:
   }
   
   void visitAssociatedTypeDecl(AssociatedTypeDecl *assocType) {
+    std::cout << "[DeclChecker][visitAssociatedTypeDecl]" << std::endl;
     if (!assocType->hasValidationStarted())
       TC.validateDecl(assocType);
   }
@@ -4345,6 +4372,7 @@ public:
   }
 
   void visitEnumDecl(EnumDecl *ED) {
+    std::cout << "[DeclChecker][visitEnumDecl]" << std::endl;
     TC.checkDeclAttributesEarly(ED);
     TC.computeAccessibility(ED);
 
@@ -4531,6 +4559,7 @@ public:
 
 
   void visitClassDecl(ClassDecl *CD) {
+    std::cout << "[DeclChecker][visitClassDecl]" << std::endl;
     TC.checkDeclAttributesEarly(CD);
     TC.computeAccessibility(CD);
 
@@ -4665,6 +4694,7 @@ public:
   }
 
   void visitProtocolDecl(ProtocolDecl *PD) {
+    std::cout << "[DeclChecker][visitProtocolDecl]" << std::endl;
     TC.checkDeclAttributesEarly(PD);
     TC.computeAccessibility(PD);
 
@@ -4738,6 +4768,7 @@ public:
   void visitVarDecl(VarDecl *VD) {
     // Delay type-checking on VarDecls until we see the corresponding
     // PatternBindingDecl.
+      std::cout << "[TypeCheckDecl][visitVarDecl]" << std::endl;
   }
 
   bool semaFuncParamPatterns(AbstractFunctionDecl *fd,
@@ -6181,11 +6212,13 @@ public:
 #undef UNINTERESTING_ATTR
 
     void visitAvailableAttr(AvailableAttr *attr) {
+        std::cout << "[TypeCheckDecl][visitAvailableAttr]" << std::endl;
       // FIXME: Check that this declaration is at least as available as the
       // one it overrides.
     }
 
     void visitRethrowsAttr(RethrowsAttr *attr) {
+        std::cout << "[TypeCheckDecl][visitRethrowsAttr]" << std::endl;
       // 'rethrows' functions are a subtype of ordinary 'throws' functions.
       // Require 'rethrows' on the override if it was there on the base,
       // unless the override is completely non-throwing.

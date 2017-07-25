@@ -47,6 +47,7 @@
 #include <memory>
 #include <utility>
 #include <tuple>
+#include <iostream>
 
 using namespace swift;
 using namespace constraints;
@@ -1818,6 +1819,8 @@ bool TypeChecker::typeCheckExpression(Expr *&expr, DeclContext *dc,
 
   // Attempt to solve the constraint system.
   SmallVector<Solution, 4> viable;
+
+  // MEMO: このsolveForExpressionでlistenerの`builtConstraints` が呼ばれて制約が生成される。
   if (solveForExpression(expr, dc, convertType.getType(),
                          allowFreeTypeVariables, listener, cs, viable, options))
     return true;
@@ -2140,6 +2143,7 @@ bool TypeChecker::typeCheckExpressionShallow(Expr *&expr, DeclContext *dc) {
 bool TypeChecker::typeCheckBinding(Pattern *&pattern, Expr *&initializer,
                                    DeclContext *DC, bool skipApplyingSolution) {
 
+  /// MEMO: ここでinternalなclassを作っている
   /// Type checking listener for pattern binding initializers.
   class BindingListener : public ExprTypeCheckListener {
     Pattern *&pattern;
@@ -2158,12 +2162,16 @@ bool TypeChecker::typeCheckBinding(Pattern *&pattern, Expr *&initializer,
 
     Type getInitType() const { return InitType; }
 
+    // MEMO: CSSolver.cppから呼ばれる
     bool builtConstraints(ConstraintSystem &cs, Expr *expr) override {
       // Save the locator we're using for the expression.
       Locator = cs.getConstraintLocator(expr);
 
       // Collect constraints from the pattern.
+      // MEMO: ここで制約を生成するっぽい
+      std::cout << "[CS][GENERATECONSTRAINTS in typeCheckBinding] BEFORE" << std::endl;
       InitType = cs.generateConstraints(pattern, Locator);
+      std::cout << "[CS][GENERATECONSTRAINTS in typeCheckBinding] AFTER" << std::endl;
       if (!InitType)
         return true;
 
@@ -2226,6 +2234,7 @@ bool TypeChecker::typeCheckBinding(Pattern *&pattern, Expr *&initializer,
   if (skipApplyingSolution)
     flags |= TypeCheckExprFlags::SkipApplyingSolution;
 
+  // MEMO: ここで型チェック
   bool hadError = typeCheckExpression(initializer, DC, contextualType,
                                      contextualPurpose,
                                      flags,
@@ -2292,7 +2301,7 @@ bool TypeChecker::typeCheckPatternBinding(PatternBindingDecl *PBD,
       DC = initContext;
   }
 
-  bool hadError = typeCheckBinding(pattern, init, DC, skipApplyingSolution);
+  bool hadError = typeCheckBinding(pattern, init, DC, skipApplyingSolution); // MEMO: ここっぽい
   PBD->setPattern(patternNumber, pattern, initContext);
   PBD->setInit(patternNumber, init);
 
@@ -2506,6 +2515,9 @@ Type ConstraintSystem::computeAssignDestType(Expr *dest, SourceLoc equalLoc) {
     // it's invalid to use non-materializable types as assignment destination.
     auto objectTv = createTypeVariable(getConstraintLocator(dest),
                                        /*options=*/0);
+
+    // MEMO: ここでBindを生成？
+    std::cout << "[CS][addKind]" << std::endl;
     auto refTv = LValueType::get(objectTv);
     addConstraint(ConstraintKind::Bind, typeVar, refTv,
                   getConstraintLocator(dest));

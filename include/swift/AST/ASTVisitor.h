@@ -42,6 +42,7 @@ class ASTVisitor {
 public:
   typedef ASTVisitor ASTVisitorType;
 
+    // MEMO:"visit"の本体
   DeclRetTy visit(Decl *D, Args... AA) {
     switch (D->getKind()) {
 #define DECL(CLASS, PARENT) \

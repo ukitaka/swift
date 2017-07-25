@@ -1185,6 +1185,7 @@ namespace {
       auto tv = CS.createTypeVariable(CS.getConstraintLocator(expr),
                                       TVO_PrefersSubtypeBinding |
                                       TVO_CanBindToInOut);
+      // MEMO: ここに来ているはず
       CS.addConstraint(ConstraintKind::LiteralConformsTo, tv,
                        protocol->getDeclaredType(),
                        CS.getConstraintLocator(expr));
