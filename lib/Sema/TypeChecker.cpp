@@ -42,6 +42,7 @@
 #include "llvm/ADT/TinyPtrVector.h"
 #include "llvm/ADT/Twine.h"
 #include <algorithm>
+#include <iostream>
 
 using namespace swift;
 
@@ -706,6 +707,9 @@ void swift::performTypeChecking(SourceFile &SF, TopLevelContext &TLC,
         continue;
 
       // MEMO: 型チェック 1回目
+      std::cout << "=====" << std::endl;
+      std::cout << "typeCheckDecl: FIRST PATH" << std::endl;
+      std::cout << "=====" << std::endl;
       TC.typeCheckDecl(D, /*isFirstPass*/true);
     }
 
@@ -723,6 +727,9 @@ void swift::performTypeChecking(SourceFile &SF, TopLevelContext &TLC,
         TC.typeCheckTopLevelCodeDecl(TLCD);
       } else {
         // MEMO: 型チェック 2回目
+      std::cout << "=====" << std::endl;
+      std::cout << "typeCheckDecl: SECONDE PATH" << std::endl;
+      std::cout << "=====" << std::endl;
         TC.typeCheckDecl(D, /*isFirstPass*/false);
       }
     }
@@ -738,6 +745,9 @@ void swift::performTypeChecking(SourceFile &SF, TopLevelContext &TLC,
       TC.processREPLTopLevel(SF, TLC, StartElem);
 
     // MEMO: これは？
+    std::cout << "=====" << std::endl;
+    std::cout << "typeCheckFunctionsAndExternalDecls" << std::endl;
+    std::cout << "=====" << std::endl;
     typeCheckFunctionsAndExternalDecls(TC);
   }
 

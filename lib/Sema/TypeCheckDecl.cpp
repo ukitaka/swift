@@ -3886,12 +3886,16 @@ public:
   DeclChecker(TypeChecker &TC, bool IsFirstPass, bool IsSecondPass)
       : TC(TC), IsFirstPass(IsFirstPass), IsSecondPass(IsSecondPass) {}
 
+  // MEMO: visitはtypeCheckDecl内で使われている
   void visit(Decl *decl) {
     PrettyStackTraceDecl StackTrace("type-checking", decl);
     
     DeclVisitor<DeclChecker>::visit(decl);
 
+    // MEMO: ValueDeclについては以下の通り
+    // ValueDecl - All named decls that are values in the language. These can have a type, etc.
     if (auto VD = dyn_cast<ValueDecl>(decl)) {
+      // MEMO: checkRedeclaration 重複チェック
       checkRedeclaration(TC, VD);
       
       // If this is a member of a nominal type, don't allow it to have a name of
@@ -3918,7 +3922,7 @@ public:
         TC.checkDeclCircularity(nominal);
       }
     }
-  }
+  } // MEMO: visitここまで
 
   //===--------------------------------------------------------------------===//
   // Visit Methods.
