@@ -691,6 +691,9 @@ void swift::performTypeChecking(SourceFile &SF, TopLevelContext &TLC,
         if (!SF)
           continue;
 
+        std::cout << "=====" << std::endl;
+        std::cout << "bindExtensionDecl: FIRST PATH" << std::endl;
+        std::cout << "=====" << std::endl;
         for (auto D : SF->Decls) {
           if (auto ED = dyn_cast<ExtensionDecl>(D))
             // MEMO: Extensionの定義をBindしている
@@ -724,6 +727,9 @@ void swift::performTypeChecking(SourceFile &SF, TopLevelContext &TLC,
       if (auto *TLCD = dyn_cast<TopLevelCodeDecl>(D)) {
         hasTopLevelCode = true;
         // Immediately perform global name-binding etc.
+          std::cout << "=====" << std::endl;
+          std::cout << "typeCheckTopLevelCodeDecl: FIRST PATH" << std::endl;
+          std::cout << "=====" << std::endl;
         TC.typeCheckTopLevelCodeDecl(TLCD);
       } else {
         // MEMO: 型チェック 2回目
@@ -753,11 +759,15 @@ void swift::performTypeChecking(SourceFile &SF, TopLevelContext &TLC,
 
   // Checking that benefits from having the whole module available.
   if (!(Options & TypeCheckingFlags::DelayWholeModuleChecking)) {
+    std::cout << "=====" << std::endl;
+    std::cout << "performWholeModuleTypeChecking" << std::endl;
+    std::cout << "=====" << std::endl;
     performWholeModuleTypeChecking(SF); // MEMO: 型チェック
   }
 
   MyTC.reset();
 
+  // MEMO: 型チェック完了
   // Verify that we've checked types correctly.
   SF.ASTStage = SourceFile::TypeChecked;
 
