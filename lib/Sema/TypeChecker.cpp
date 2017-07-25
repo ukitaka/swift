@@ -506,6 +506,7 @@ static void typeCheckFunctionsAndExternalDecls(TypeChecker &TC) {
   unsigned currentFunctionIdx = 0;
   unsigned currentExternalDef = TC.Context.LastCheckedExternalDefinition;
   do {
+    // MEMO: 関数の型チェック
     // Type check the body of each of the function in turn.  Note that outside
     // functions must be visited before nested functions for type-checking to
     // work correctly.
@@ -519,11 +520,16 @@ static void typeCheckFunctionsAndExternalDecls(TypeChecker &TC) {
       if (AFD->isBodyTypeChecked()) continue;
 
       PrettyStackTraceDecl StackEntry("type-checking", AFD);
+      // MEMO: ここで関数のbodyの型チェック
+      std::cout << "=====" << std::endl;
+      std::cout << "typeCheckAbstractFunctionBody in typeCheckFunctionsAndExternalDecls" << std::endl;
+      std::cout << "=====" << std::endl;
       TC.typeCheckAbstractFunctionBody(AFD);
 
       AFD->setBodyTypeCheckedIfPresent();
     }
 
+    // MEMO: 外部のモジュール？の型チェック
     for (unsigned n = TC.Context.ExternalDefinitions.size();
          currentExternalDef != n;
          ++currentExternalDef) {
@@ -751,6 +757,7 @@ void swift::performTypeChecking(SourceFile &SF, TopLevelContext &TLC,
       TC.processREPLTopLevel(SF, TLC, StartElem);
 
     // MEMO: これは？
+    // MEMO: TopLevelの関数などはここで型チェックされる
     std::cout << "=====" << std::endl;
     std::cout << "typeCheckFunctionsAndExternalDecls" << std::endl;
     std::cout << "=====" << std::endl;

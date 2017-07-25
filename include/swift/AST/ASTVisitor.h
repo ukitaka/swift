@@ -81,6 +81,7 @@ public:
 #define EXPR(CLASS, PARENT) ABSTRACT_EXPR(CLASS, PARENT)
 #include "swift/AST/ExprNodes.def"
 
+    // MEMO: Stmtのためのvisit本体
   StmtRetTy visit(Stmt *S, Args... AA) {
     switch (S->getKind()) {
 

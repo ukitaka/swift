@@ -28,6 +28,7 @@
 #include "llvm/ADT/MapVector.h"
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Support/SaveAndRestore.h"
+#include <iostream>
 using namespace swift;
 
 /// Return true if this expression is an implicit promotion from T to T?.
@@ -2598,6 +2599,7 @@ performTopLevelDeclDiagnostics(TypeChecker &TC, TopLevelCodeDecl *TLCD) {
 }
 
 /// Perform diagnostics for func/init/deinit declarations.
+// MEMO: performAbstractFuncDeclDiagnostics ここで関数などの型チェックがされる
 void swift::performAbstractFuncDeclDiagnostics(TypeChecker &TC,
                                                AbstractFunctionDecl *AFD) {
   assert(AFD->getBody() && "Need a body to check");
@@ -3541,21 +3543,29 @@ void swift::performSyntacticExprDiagnostics(TypeChecker &TC, const Expr *E,
     diagDeprecatedObjCSelectors(TC, DC, E);
 }
 
+// MEMO: 関数の型チェック本体
 void swift::performStmtDiagnostics(TypeChecker &TC, const Stmt *S) {
   TC.checkUnsupportedProtocolType(const_cast<Stmt *>(S));
     
-  if (auto forStmt = dyn_cast<ForStmt>(S))
-    checkCStyleForLoop(TC, forStmt);
+    if (auto forStmt = dyn_cast<ForStmt>(S)) {
+        std::cout << "[CSTYPEFORLOOP]" << std::endl;
+        checkCStyleForLoop(TC, forStmt);
+    }
   
-  if (auto switchStmt = dyn_cast<SwitchStmt>(S))
-    checkSwitch(TC, switchStmt);
+    if (auto switchStmt = dyn_cast<SwitchStmt>(S)) {
+        std::cout << "[SWITCH]" << std::endl;
+        checkSwitch(TC, switchStmt);
+    }
 
+    std::cout << "[Trailing Closure]" << std::endl;
   checkStmtConditionTrailingClosure(TC, S);
   
   // Check for implicit optional promotions in stmt-condition patterns.
   if (auto *lcs = dyn_cast<LabeledConditionalStmt>(S))
-    for (const auto &elt : lcs->getCond())
-      checkImplicitPromotionsInCondition(elt, TC);
+      for (const auto &elt : lcs->getCond()) {
+          std::cout << "[checkImplicitPromotionsInCondition]" << std::endl;
+          checkImplicitPromotionsInCondition(elt, TC);
+      }
 }
 
 //===----------------------------------------------------------------------===//

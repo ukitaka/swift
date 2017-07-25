@@ -42,6 +42,7 @@
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/Format.h"
 #include "llvm/Support/Timer.h"
+#include <iostream>
 
 using namespace swift;
 
@@ -367,15 +368,16 @@ public:
   
   template<typename StmtTy>
   bool typeCheckStmt(StmtTy *&S) {
-    StmtTy *S2 = cast_or_null<StmtTy>(visit(S));
+    StmtTy *S2 = cast_or_null<StmtTy>(visit(S)); // MEMO: このvisitで各visitXXXXStmt関数へと振り分けられて処理される
     if (S2 == nullptr)
       return true;
     S = S2;
-    performStmtDiagnostics(TC, S);
+    performStmtDiagnostics(TC, S); // MEMO: これが関数BODYの型チェック本体
     return false;
   }
 
   /// Type-check an entire function body.
+  // MEMO: { ... } として、チェック
   bool typeCheckBody(BraceStmt *&S) {
     typeCheckStmt(S);
     setAutoClosureDiscriminators(DC, S);
@@ -1244,9 +1246,14 @@ void TypeChecker::checkIgnoredExpr(Expr *E) {
     .highlight(valueE->getSourceRange());
 }
 
+// MEMO: 関数本体はBraceStmt { ... } としてここでチェックされる
 Stmt *StmtChecker::visitBraceStmt(BraceStmt *BS) {
   const SourceManager &SM = TC.Context.SourceMgr;
   for (auto &elem : BS->getElements()) {
+
+    // ----------------------------------
+    // MEMO: Exprの場合
+    // ----------------------------------
     if (auto *SubExpr = elem.dyn_cast<Expr*>()) {
       SourceLoc Loc = SubExpr->getStartLoc();
       if (EndTypeCheckLoc.isValid() &&
@@ -1282,6 +1289,9 @@ Stmt *StmtChecker::visitBraceStmt(BraceStmt *BS) {
       continue;
     }
 
+    // ----------------------------------
+    // MEMO: Stmtの場合
+    // ----------------------------------
     if (auto *SubStmt = elem.dyn_cast<Stmt*>()) {
       SourceLoc Loc = SubStmt->getStartLoc();
       if (EndTypeCheckLoc.isValid() &&
@@ -1293,6 +1303,9 @@ Stmt *StmtChecker::visitBraceStmt(BraceStmt *BS) {
       continue;
     }
 
+    // ----------------------------------
+    // MEMO: Declの場合
+    // ----------------------------------
     Decl *SubDecl = elem.get<Decl *>();
     SourceLoc Loc = SubDecl->getStartLoc();
     if (EndTypeCheckLoc.isValid() &&
@@ -1348,6 +1361,7 @@ static void checkDefaultArguments(TypeChecker &tc,
   }
 }
 
+// MEMO: ここの中のどこかでs001の場合の制約が生成されている
 bool TypeChecker::typeCheckAbstractFunctionBodyUntil(AbstractFunctionDecl *AFD,
                                                      SourceLoc EndTypeCheckLoc) {
   validateDecl(AFD);
@@ -1355,13 +1369,24 @@ bool TypeChecker::typeCheckAbstractFunctionBodyUntil(AbstractFunctionDecl *AFD,
   if (!AFD->getBody())
     return false;
 
-  if (auto *FD = dyn_cast<FuncDecl>(AFD))
-    return typeCheckFunctionBodyUntil(FD, EndTypeCheckLoc);
+    if (auto *FD = dyn_cast<FuncDecl>(AFD)) {
+        std::cout << "!!!=====" << std::endl;
+        std::cout << "typeCheckFunctionBodyUntil in typeCheckAbstractFunctionBodyUntil" << std::endl;
+        std::cout << "!!!=====" << std::endl;
+        return typeCheckFunctionBodyUntil(FD, EndTypeCheckLoc); // MEMO: ここだった
+    }
 
-  if (auto *CD = dyn_cast<ConstructorDecl>(AFD))
-    return typeCheckConstructorBodyUntil(CD, EndTypeCheckLoc);
+    if (auto *CD = dyn_cast<ConstructorDecl>(AFD)) {
+        std::cout << "!!!=====" << std::endl;
+        std::cout << "typeCheckConstructorBodyUntil in typeCheckAbstractFunctionBodyUntil" << std::endl;
+        std::cout << "!!!=====" << std::endl;
+        return typeCheckConstructorBodyUntil(CD, EndTypeCheckLoc);
+    }
 
-  auto *DD = cast<DestructorDecl>(AFD);
+    std::cout << "!!!=====" << std::endl;
+    std::cout << "typeCheckDestructorBodyUntil in typeCheckAbstractFunctionBodyUntil" << std::endl;
+    std::cout << "!!!=====" << std::endl;
+    auto *DD = cast<DestructorDecl>(AFD);
   return typeCheckDestructorBodyUntil(DD, EndTypeCheckLoc);
 }
 
@@ -1378,9 +1403,17 @@ bool TypeChecker::typeCheckAbstractFunctionBody(AbstractFunctionDecl *AFD) {
   if (DebugTimeFunctionBodies || WarnLongFunctionBodies)
     timer.emplace(AFD, DebugTimeFunctionBodies, WarnLongFunctionBodies);
 
-  if (typeCheckAbstractFunctionBodyUntil(AFD, SourceLoc()))
-    return true;
-  
+    // MEMO: ここでtypeCheckされる 返り値はなんだ？
+    std::cout << "!!!=====" << std::endl;
+    std::cout << "typeCheckAbstractFunctionBodyUntil in typeCheckAbstractFunctionBody" << std::endl;
+    std::cout << "!!!=====" << std::endl;
+    if (typeCheckAbstractFunctionBodyUntil(AFD, SourceLoc())) {
+        return true;
+    }
+
+  std::cout << "!!!=====" << std::endl;
+  std::cout << "performAbstractFuncDeclDiagnostics in typeCheckAbstractFunctionBody" << std::endl;
+  std::cout << "!!!=====" << std::endl;
   performAbstractFuncDeclDiagnostics(*this, AFD);
   return false;
 }
@@ -1404,7 +1437,7 @@ bool TypeChecker::typeCheckFunctionBodyUntil(FuncDecl *FD,
 
   StmtChecker SC(*this, static_cast<AbstractFunctionDecl *>(FD));
   SC.EndTypeCheckLoc = EndTypeCheckLoc;
-  bool HadError = SC.typeCheckBody(BS);
+  bool HadError = SC.typeCheckBody(BS); // MEMO: ここで関数のBODYの型チェック
 
   FD->setBody(BS);
   return HadError;
