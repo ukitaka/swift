@@ -646,6 +646,7 @@ void swift::performTypeChecking(SourceFile &SF, TopLevelContext &TLC,
     // verification.
     SharedTimer timer("Type checking / Semantic analysis");
 
+    // MEMO: TypeCheckerの設定
     if (MyTC) {
       MyTC->setWarnLongFunctionBodies(WarnLongFunctionBodies);
       MyTC->setWarnLongExpressionTypeChecking(WarnLongExpressionTypeChecking);
@@ -691,6 +692,7 @@ void swift::performTypeChecking(SourceFile &SF, TopLevelContext &TLC,
 
         for (auto D : SF->Decls) {
           if (auto ED = dyn_cast<ExtensionDecl>(D))
+            // MEMO: Extensionの定義をBindしている
             bindExtensionDecl(ED, TC);
         }
       }
@@ -703,6 +705,7 @@ void swift::performTypeChecking(SourceFile &SF, TopLevelContext &TLC,
       if (isa<TopLevelCodeDecl>(D))
         continue;
 
+      // MEMO: 型チェック 1回目
       TC.typeCheckDecl(D, /*isFirstPass*/true);
     }
 
@@ -719,6 +722,7 @@ void swift::performTypeChecking(SourceFile &SF, TopLevelContext &TLC,
         // Immediately perform global name-binding etc.
         TC.typeCheckTopLevelCodeDecl(TLCD);
       } else {
+        // MEMO: 型チェック 2回目
         TC.typeCheckDecl(D, /*isFirstPass*/false);
       }
     }
@@ -733,12 +737,13 @@ void swift::performTypeChecking(SourceFile &SF, TopLevelContext &TLC,
     if (SF.Kind == SourceFileKind::REPL && !Ctx.hadError())
       TC.processREPLTopLevel(SF, TLC, StartElem);
 
+    // MEMO: これは？
     typeCheckFunctionsAndExternalDecls(TC);
   }
 
   // Checking that benefits from having the whole module available.
   if (!(Options & TypeCheckingFlags::DelayWholeModuleChecking)) {
-    performWholeModuleTypeChecking(SF);
+    performWholeModuleTypeChecking(SF); // MEMO: 型チェック
   }
 
   MyTC.reset();
