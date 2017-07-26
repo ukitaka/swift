@@ -1,0 +1,15 @@
+@startuml
+
+Pattern <|-- ParenPattern
+Pattern <|-- TuplePattern
+Pattern <|-- NamedPattern
+Pattern <|-- AnyPattern
+Pattern <|-- TypedPattern
+Pattern <|-- IsPattern
+Pattern <|-- EnumElementPattern
+Pattern <|-- BoolPattern
+Pattern <|-- OptionalSomePattern
+Pattern <|-- ExprPattern
+Pattern <|-- VarPattern
+
+@enduml
