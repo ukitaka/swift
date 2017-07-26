@@ -4,6 +4,8 @@ Expr <|-- CodeCompletionExpr
 Expr <|-- LiteralExpr
   LiteralExpr <|-- NilLiteralExpr
   LiteralExpr <|-- NumberLiteralExpr
+    NumberLiteralExpr <|-- IntegerLiteralExpr
+    NumberLiteralExpr <|-- FloatLiteralExpr
   LiteralExpr <|-- BooleanLiteralExpr
   LiteralExpr <|-- StringLiteralExpr
   LiteralExpr <|-- InterpolatedStringLiteralExpr
@@ -27,8 +29,8 @@ Expr <|-- AnyTryExpr
   AnyTryExpr <|-- OptionalTryExpr
 Expr <|-- IdentifyExpr
 Expr <|-- CollectionExpr
-  ArrayExpr <|-- CollectionExpr
-  DictionaryExpr <|-- CollectionExpr
+  CollectionExpr <|-- ArrayExpr
+  CollectionExpr <|-- DictionaryExpr
 Expr <|-- KeyPathApplicationExpr
 Expr <|-- UnresolvedDotExpr
 Expr <|-- TupleElementExpr
@@ -74,9 +76,14 @@ Expr <|-- ApplyExpr
   ApplyExpr <|-- PostfixUnaryExpr
   ApplyExpr <|-- BinaryExpr
   ApplyExpr <|-- SelfApplyExpr
+    SelfApplyExpr <|-- DotSyntaxCallExpr
+    SelfApplyExpr <|-- ConstructorRefCallExpr
 Expr <|-- DotSyntaxBaseIgnoredExpr
 Expr <|-- ExplicitCastExpr
   ExplicitCastExpr <|-- CheckedCastExpr
+    CheckedCastExpr <|-- ForcedCheckedCastExpr
+    CheckedCastExpr <|-- ConditionalCheckedCastExpr
+    CheckedCastExpr <|-- IsExpr
   ExplicitCastExpr <|-- CoerceExpr
 Expr <|-- ArrowExpr
 Expr <|-- RebindSelfInConstructorExpr
