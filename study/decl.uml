@@ -1,130 +1,38 @@
 @startuml
 
-class Decl
-
-
-
-
-class IfConfigDecl
-class ValueDecl
-class PrecedenceGroupDecl
-class OperatorDecl
-class MissingMemberDecl
-class ImportDecl
-class ExtensionDecl
-class PatternBindingDecl
-class TopLevelCodeDecl
-class EnumCaseDecl
-
 Decl <|-- IfConfigDecl
 Decl <|-- ValueDecl
+  ValueDecl <|-- TypeDecl
+    TypeDecl <|-- GenericTypeDecl
+      GenericTypeDecl <|-- TypeAliasDecl
+      GenericTypeDecl <|-- NominalTypeDecl
+        NominalTypeDecl <|-- EnumDecl
+        NominalTypeDecl <|-- StructDecl
+        NominalTypeDecl <|-- ClassDecl
+        NominalTypeDecl <|-- ProtocolDecl
+    TypeDecl <|-- AbstractTypeParamDecl
+      AbstractTypeParamDecl <|-- GenericTypeParameterDecl
+      AbstractTypeParamDecl <|-- AssociatedTypeDecl
+    TypeDecl <|-- ModuleDecl
+  ValueDecl <|-- AbstractStorageDecl
+    AbstractStorageDecl <|-- VarDecl
+      VarDecl <|-- ParamDecl
+    AbstractStorageDecl <|-- SubscriptDecl
+  ValueDecl <|-- AbstractFunctionDecl
+    AbstractFunctionDecl <|-- FuncDecl
+    AbstractFunctionDecl <|-- ConstructorDecl
+    AbstractFunctionDecl <|-- DestructorDecl
+  ValueDecl <|-- EnumElementDecl
 Decl <|-- PrecedenceGroupDecl
 Decl <|-- OperatorDecl
+  OperatorDecl <|-- InfixOperatorDecl
+  OperatorDecl <|-- PrefixOperatorDecl
+  OperatorDecl <|-- PostfixOperatorDecl
 Decl <|-- MissingMemberDecl
 Decl <|-- ImportDecl
 Decl <|-- ExtensionDecl
 Decl <|-- PatternBindingDecl
 Decl <|-- TopLevelCodeDecl
 Decl <|-- EnumCaseDecl
-
-'IfConfigのサブクラス
-' なし
-
-'ValueDeclのサブクラス
-class TypeDecl
-class AbstractStorageDecl
-class AbstractFunctionDecl
-class EnumElementDecl
-
-ValueDecl <|-- TypeDecl
-ValueDecl <|-- AbstractStorageDecl
-ValueDecl <|-- AbstractFunctionDecl
-ValueDecl <|-- EnumElementDecl
-
-'PrecedenceGroupDeclのサブクラス
-'なし
-
-'OperatorDeclのサブクラス
-class InfixOperatorDecl
-class PrefixOperatorDecl
-class PostfixOperatorDecl
-OperatorDecl <|-- InfixOperatorDecl
-OperatorDecl <|-- PrefixOperatorDecl
-OperatorDecl <|-- PostfixOperatorDecl
-
-' MissingMemberDeclのサブクラス
-' なし
-
-' ImportDeclのサブクラス
-' なし
-
-' ExtensionDeclのサブクラス
-' なし
-
-' PatternBindingDeclのサブクラス
-' なし
-
-' TopLevelCodeDeclのサブクラス
-' なし
-
-' EnumCaseDeclのサブクラス
-' なし
-
-' AbstractStorageDeclのサブクラス
-class VarDecl
-class SubscriptDecl
-AbstractStorageDecl <|-- VarDecl
-AbstractStorageDecl <|-- SubscriptDecl
-
-' AbstractFunctionDeclのサブクラス
-class FuncDecl
-class ConstructorDecl
-class DestructorDecl
-AbstractFunctionDecl <|-- FuncDecl
-AbstractFunctionDecl <|-- ConstructorDecl
-AbstractFunctionDecl <|-- DestructorDecl
-
-' VarDeclのサブクラス
-class ParamDecl
-VarDecl <|-- ParamDecl
-
-
-'TypeDeclのサブクラス
-class GenericTypeDecl
-class AbstractTypeParamDecl
-class ModuleDecl
-
-TypeDecl <|-- GenericTypeDecl
-TypeDecl <|-- AbstractTypeParamDecl
-TypeDecl <|-- ModuleDecl
-
-'GenericTypeDeclのサブクラス
-class TypeAliasDecl
-class NominalTypeDecl
-
-GenericTypeDecl <|-- TypeAliasDecl
-GenericTypeDecl <|-- NominalTypeDecl
-
-'AbstractTypeParamDeclのサブクラス
-class TypeAliasDecl
-class NominalTypeDecl
-
-AbstractTypeParamDecl <|-- GenericTypeParameterDecl
-AbstractTypeParamDecl <|-- AssociatedTypeDecl
-
-together {
-  class EnumDecl
-  class StructDecl
-  class ClassDecl
-  class ProtocolDecl
-  NominalTypeDecl <|-- EnumDecl
-  NominalTypeDecl <|-- StructDecl
-  NominalTypeDecl <|-- ClassDecl
-  NominalTypeDecl <|-- ProtocolDecl
-}
-
-
-
-
 
 @enduml
