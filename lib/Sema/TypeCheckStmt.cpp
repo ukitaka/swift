@@ -1248,6 +1248,7 @@ void TypeChecker::checkIgnoredExpr(Expr *E) {
 
 // MEMO: 関数本体はBraceStmt { ... } としてここでチェックされる
 Stmt *StmtChecker::visitBraceStmt(BraceStmt *BS) {
+  std::cout << "[Stmt][visitBraceStmt] Start" << std::endl;
   const SourceManager &SM = TC.Context.SourceMgr;
   for (auto &elem : BS->getElements()) {
 
@@ -1268,8 +1269,11 @@ Stmt *StmtChecker::visitBraceStmt(BraceStmt *BS) {
       if (isDiscarded)
         options |= TypeCheckExprFlags::IsDiscarded;
 
+      // MEMO: ここで`typeCheckExpression` が呼ばれる
+      std::cout << "[TC][typeCheckExpression] BEFORE" << std::endl;
       bool hadTypeError = TC.typeCheckExpression(SubExpr, DC, TypeLoc(),
                                                  CTP_Unused, options);
+      std::cout << "[TC][typeCheckExpression] AFTER" << std::endl;
 
       // If a closure expression is unused, the user might have intended
       // to write "do { ... }".

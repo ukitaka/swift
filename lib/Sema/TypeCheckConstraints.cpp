@@ -1653,6 +1653,7 @@ solveForExpression(Expr *&expr, DeclContext *dc, Type convertType,
     return true;
 
   // Attempt to solve the constraint system.
+  // MEMO: ここのsolveに到達
   auto solution = cs.solve(expr,
                            convertType,
                            listener,
@@ -1821,6 +1822,7 @@ bool TypeChecker::typeCheckExpression(Expr *&expr, DeclContext *dc,
   SmallVector<Solution, 4> viable;
 
   // MEMO: このsolveForExpressionでlistenerの`builtConstraints` が呼ばれて制約が生成される。
+  // MEMO: 実際 let a = 2の例で、ConversionのConstraintが生成されるのはこのタイミング
   if (solveForExpression(expr, dc, convertType.getType(),
                          allowFreeTypeVariables, listener, cs, viable, options))
     return true;
@@ -2165,6 +2167,7 @@ bool TypeChecker::typeCheckBinding(Pattern *&pattern, Expr *&initializer,
     // MEMO: CSSolver.cppから呼ばれる
     bool builtConstraints(ConstraintSystem &cs, Expr *expr) override {
       // Save the locator we're using for the expression.
+      std::cout << "[CS][getConstraintLocator in typeCheckBinding] BEFORE" << std::endl;
       Locator = cs.getConstraintLocator(expr);
 
       // Collect constraints from the pattern.

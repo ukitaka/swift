@@ -23,6 +23,7 @@
 #include "llvm/Support/SaveAndRestore.h"
 #include <memory>
 #include <tuple>
+#include <iostream>
 
 using namespace swift;
 using namespace constraints;
@@ -1266,6 +1267,7 @@ ConstraintSystem::solve(Expr *&expr,
                         ExprTypeCheckListener *listener,
                         SmallVectorImpl<Solution> &solutions,
                         FreeTypeVariableBinding allowFreeTypeVariables) {
+  std::cout << "[CS][START `solve`]" << std::endl;
   if (TC.getLangOpts().DebugConstraintSolver) {
     auto &log = getASTContext().TypeCheckerDebug->getStream();
     log << "---Constraint solving for the expression at ";
@@ -1290,6 +1292,7 @@ ConstraintSystem::solve(Expr *&expr,
   shrink(expr);
 
   // Generate constraints for the main system.
+    // MEMO: ここで1つ制約が作られていた。
   if (auto generatedExpr = generateConstraints(expr))
     expr = generatedExpr;
   else {
@@ -1300,6 +1303,7 @@ ConstraintSystem::solve(Expr *&expr,
   // constraint.
   if (convertType) {
     auto constraintKind = ConstraintKind::Conversion;
+    std::cout << "[CS][solve] 6" << std::endl;
     if (getContextualTypePurpose() == CTP_CallArgument)
       constraintKind = ConstraintKind::ArgumentConversion;
 
@@ -1312,14 +1316,20 @@ ConstraintSystem::solve(Expr *&expr,
       });
     }
 
+    // MEMO: --------
+    std::cout << "[CS][ADD CON in solve] BEFORE" << std::endl;
     addConstraint(constraintKind, getType(expr), convertType,
                   getConstraintLocator(expr), /*isFavored*/ true);
+    std::cout << "[CS][ADD CON in solve] AFTER" << std::endl;
   }
 
   // Notify the listener that we've built the constraint system.
+  // MEMO: ここでやっとBuildConstraintsが呼ばれる
+  std::cout << "[CS][BuildConstraints in solve] BEFORE" << std::endl;
   if (listener && listener->builtConstraints(*this, expr)) {
     return SolutionKind::Error;
   }
+  std::cout << "[CS][BuildConstraints in solve] AFTER" << std::endl;
 
   if (TC.getLangOpts().DebugConstraintSolver) {
     auto &log = getASTContext().TypeCheckerDebug->getStream();
