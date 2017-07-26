@@ -76,13 +76,41 @@ class SubscriptDecl
 AbstractStorageDecl <|-- VarDecl
 AbstractStorageDecl <|-- SubscriptDecl
 
+' AbstractFunctionDeclのサブクラス
+class FuncDecl
+class ConstructorDecl
+class DestructorDecl
+AbstractFunctionDecl <|-- FuncDecl
+AbstractFunctionDecl <|-- ConstructorDecl
+AbstractFunctionDecl <|-- DestructorDecl
+
+' VarDeclのサブクラス
+class ParamDecl
+VarDecl <|-- ParamDecl
+
 
 'TypeDeclのサブクラス
 class GenericTypeDecl
+class AbstractTypeParamDecl
+class ModuleDecl
+
+TypeDecl <|-- GenericTypeDecl
+TypeDecl <|-- AbstractTypeParamDecl
+TypeDecl <|-- ModuleDecl
 
 'GenericTypeDeclのサブクラス
+class TypeAliasDecl
 class NominalTypeDecl
 
+GenericTypeDecl <|-- TypeAliasDecl
+GenericTypeDecl <|-- NominalTypeDecl
+
+'AbstractTypeParamDeclのサブクラス
+class TypeAliasDecl
+class NominalTypeDecl
+
+AbstractTypeParamDecl <|-- GenericTypeParameterDecl
+AbstractTypeParamDecl <|-- AssociatedTypeDecl
 
 together {
   class EnumDecl
@@ -95,8 +123,7 @@ together {
   NominalTypeDecl <|-- ProtocolDecl
 }
 
-TypeDecl <|-- GenericTypeDecl
-GenericTypeDecl <|-- NominalTypeDecl
+
 
 
 
