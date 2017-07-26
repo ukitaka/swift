@@ -1,0 +1,26 @@
+@startuml
+
+class Decl
+class ValueDecl
+class TypeDecl
+class GenericTypeDecl
+class NominalTypeDecl
+
+together {
+  class EnumDecl
+  class StructDecl
+  class ClassDecl
+  class ProtocolDecl
+}
+
+
+Decl <|-- ValueDecl
+ValueDecl <|-- TypeDecl
+TypeDecl <|-- GenericTypeDecl
+GenericTypeDecl <|-- NominalTypeDecl
+NominalTypeDecl <|-- EnumDecl
+NominalTypeDecl <|-- StructDecl
+NominalTypeDecl <|-- ClassDecl
+NominalTypeDecl <|-- ProtocolDecl
+
+@enduml
