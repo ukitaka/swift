@@ -1303,7 +1303,6 @@ ConstraintSystem::solve(Expr *&expr,
   // constraint.
   if (convertType) {
     auto constraintKind = ConstraintKind::Conversion;
-    std::cout << "[CS][solve] 6" << std::endl;
     if (getContextualTypePurpose() == CTP_CallArgument)
       constraintKind = ConstraintKind::ArgumentConversion;
 
