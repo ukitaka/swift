@@ -1,26 +1,78 @@
 @startuml
 
 class Decl
+
+
+
+
+class IfConfigDecl
 class ValueDecl
+class PrecedenceGroupDecl
+class OperatorDecl
+class MissingMemberDecl
+class ImportDecl
+class ExtensionDecl
+class PatternBindingDecl
+class TopLevelCodeDecl
+class EnumCaseDecl
+
+Decl <|-- IfConfigDecl
+Decl <|-- ValueDecl
+Decl <|-- PrecedenceGroupDecl
+Decl <|-- OperatorDecl
+Decl <|-- MissingMemberDecl
+Decl <|-- ImportDecl
+Decl <|-- ExtensionDecl
+Decl <|-- PatternBindingDecl
+Decl <|-- TopLevelCodeDecl
+Decl <|-- EnumCaseDecl
+
+'IfConfigのサブクラス
+' なし
+
+'ValueDeclのサブクラス
 class TypeDecl
+class AbstractStorageDecl
+class AbstractFunctionDecl
+class EnumElementDecl
+
+ValueDecl <|-- TypeDecl
+ValueDecl <|-- AbstractStorageDecl
+ValueDecl <|-- AbstractFunctionDecl
+ValueDecl <|-- EnumElementDecl
+
+'PrecedenceGroupDeclのサブクラス
+'なし
+
+'OperatorDeclのサブクラス
+class InfixOperatorDecl
+class PrefixOperatorDecl
+class PostfixOperatorDecl
+OperatorDecl <|-- InfixOperatorDecl
+OperatorDecl <|-- PrefixOperatorDecl
+OperatorDecl <|-- PostfixOperatorDecl
+
+'TypeDeclのサブクラス
 class GenericTypeDecl
+
+'GenericTypeDeclのサブクラス
 class NominalTypeDecl
+
 
 together {
   class EnumDecl
   class StructDecl
   class ClassDecl
   class ProtocolDecl
+  NominalTypeDecl <|-- EnumDecl
+  NominalTypeDecl <|-- StructDecl
+  NominalTypeDecl <|-- ClassDecl
+  NominalTypeDecl <|-- ProtocolDecl
 }
 
-
-Decl <|-- ValueDecl
-ValueDecl <|-- TypeDecl
 TypeDecl <|-- GenericTypeDecl
 GenericTypeDecl <|-- NominalTypeDecl
-NominalTypeDecl <|-- EnumDecl
-NominalTypeDecl <|-- StructDecl
-NominalTypeDecl <|-- ClassDecl
-NominalTypeDecl <|-- ProtocolDecl
+
+
 
 @enduml
