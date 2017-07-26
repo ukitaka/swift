@@ -2,18 +2,33 @@
 Expr <|-- ErrorExpr
 Expr <|-- CodeCompletionExpr
 Expr <|-- LiteralExpr
+  LiteralExpr <|-- NilLiteralExpr
+  LiteralExpr <|-- NumberLiteralExpr
+  LiteralExpr <|-- BooleanLiteralExpr
+  LiteralExpr <|-- StringLiteralExpr
+  LiteralExpr <|-- InterpolatedStringLiteralExpr
+  LiteralExpr <|-- MagicIdentifierLiteralExpr
+  LiteralExpr <|-- ObjectLiteralExpr
 Expr <|-- DiscardAssignmentExpr
 Expr <|-- DeclRefExpr
 Expr <|-- SuperRefExpr
 Expr <|-- TypeExpr
 Expr <|-- OtherConstructorDeclRefExpr
 Expr <|-- OverloadSetRefExpr
+  OverloadSetRefExpr <|-- OverloadedDeclRefExpr
 Expr <|-- UnresolvedDeclRefExpr
 Expr <|-- MemberRefExpr
 Expr <|-- DynamicLookupExpr
+  DynamicLookupExpr <|-- DynamicMemberRefExpr
+  DynamicLookupExpr <|-- DynamicSubscriptExpr
 Expr <|-- AnyTryExpr
+  AnyTryExpr <|-- TryExpr
+  AnyTryExpr <|-- ForceTryExpr
+  AnyTryExpr <|-- OptionalTryExpr
 Expr <|-- IdentifyExpr
 Expr <|-- CollectionExpr
+  ArrayExpr <|-- CollectionExpr
+  DictionaryExpr <|-- CollectionExpr
 Expr <|-- KeyPathApplicationExpr
 Expr <|-- UnresolvedDotExpr
 Expr <|-- TupleElementExpr
@@ -23,14 +38,46 @@ Expr <|-- ForceValueExpr
 Expr <|-- MakeTemporarilyEscapableExpr
 Expr <|-- OpenExistentialExpr
 Expr <|-- ImplicitConversionExpr
+  ImplicitConversionExpr <|-- ClassMetatypeToObjectExpr
+  ImplicitConversionExpr <|-- ExistentialMetatypeToObjectExpr
+  ImplicitConversionExpr <|-- ProtocolMetatypeToObjectExpr
+  ImplicitConversionExpr <|-- InjectIntoOptionalExpr
+  ImplicitConversionExpr <|-- InOutToPointerExpr
+  ImplicitConversionExpr <|-- ArrayToPointerExpr
+  ImplicitConversionExpr <|-- StringToPointerExpr
+  ImplicitConversionExpr <|-- PointerToPointerExpr
+  ImplicitConversionExpr <|-- ForeignObjectConversionExpr
+  ImplicitConversionExpr <|-- UnevaluatedInstanceExpr
+  ImplicitConversionExpr <|-- TupleShuffleExpr
+  ImplicitConversionExpr <|-- LoadExpr
+  ImplicitConversionExpr <|-- UnresolvedTypeConversionExpr
+  ImplicitConversionExpr <|-- FunctionConversionExpr
+  ImplicitConversionExpr <|-- CovariantFunctionConversionExpr
+  ImplicitConversionExpr <|-- CovariantReturnConversionExpr
+  ImplicitConversionExpr <|-- MetatypeConversionExpr
+  ImplicitConversionExpr <|-- CollectionUpcastConversionExpr
+  ImplicitConversionExpr <|-- ErasureExpr
+  ImplicitConversionExpr <|-- AnyHashableErasureExpr
+  ImplicitConversionExpr <|-- ConditionalBridgeFromObjCExpr
+  ImplicitConversionExpr <|-- BridgeFromObjCExpr
+  ImplicitConversionExpr <|-- BridgeToObjCExpr
+  ImplicitConversionExpr <|-- DerivedToBaseExpr
+  ImplicitConversionExpr <|-- ArchetypeToSuperExpr
 Expr <|-- UnresolvedSpecializeExpr
 Expr <|-- InOutExpr
 Expr <|-- CaptureListExpr
 Expr <|-- DynamicTypeExpr
 Expr <|-- OpaqueValueExpr
 Expr <|-- ApplyExpr
+  ApplyExpr <|-- CallExpr
+  ApplyExpr <|-- PrefixUnaryExpr
+  ApplyExpr <|-- PostfixUnaryExpr
+  ApplyExpr <|-- BinaryExpr
+  ApplyExpr <|-- SelfApplyExpr
 Expr <|-- DotSyntaxBaseIgnoredExpr
 Expr <|-- ExplicitCastExpr
+  ExplicitCastExpr <|-- CheckedCastExpr
+  ExplicitCastExpr <|-- CoerceExpr
 Expr <|-- ArrowExpr
 Expr <|-- RebindSelfInConstructorExpr
 Expr <|-- IfExpr
@@ -45,5 +92,7 @@ Expr <|-- UnresolvedMemberExpr
 Expr <|-- TupleExpr
 Expr <|-- SubscriptExpr
 Expr <|-- AbstractClosure
+  AbstractClosure <|-- ClosureExpr
+  AbstractClosure <|-- AutoClosureExpr
 @enduml
 
