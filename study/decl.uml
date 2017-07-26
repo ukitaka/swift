@@ -52,6 +52,31 @@ OperatorDecl <|-- InfixOperatorDecl
 OperatorDecl <|-- PrefixOperatorDecl
 OperatorDecl <|-- PostfixOperatorDecl
 
+' MissingMemberDeclのサブクラス
+' なし
+
+' ImportDeclのサブクラス
+' なし
+
+' ExtensionDeclのサブクラス
+' なし
+
+' PatternBindingDeclのサブクラス
+' なし
+
+' TopLevelCodeDeclのサブクラス
+' なし
+
+' EnumCaseDeclのサブクラス
+' なし
+
+' AbstractStorageDeclのサブクラス
+class VarDecl
+class SubscriptDecl
+AbstractStorageDecl <|-- VarDecl
+AbstractStorageDecl <|-- SubscriptDecl
+
+
 'TypeDeclのサブクラス
 class GenericTypeDecl
 
