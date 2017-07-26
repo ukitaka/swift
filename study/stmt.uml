@@ -1,0 +1,25 @@
+@startuml
+
+Stmt <|-- BraceStmt
+Stmt <|-- ReturnStmt
+Stmt <|-- DeferStmt
+Stmt <|-- LabeledStmt
+  LabeledStmt <|-- DoStmt
+  LabeledStmt <|-- DoCatchStmt
+  LabeledStmt <|-- LabeledConditionalStmt
+    LabeledConditionalStmt <|-- IfStmt
+    LabeledConditionalStmt <|-- GuardStmt
+    LabeledConditionalStmt <|-- WhileStmt
+  LabeledStmt <|-- RepeatWhileStmt
+  LabeledStmt <|-- ForStmt
+  LabeledStmt <|-- ForEachStmt
+  LabeledStmt <|-- SwitchStmt
+Stmt <|-- CatchStmt
+Stmt <|-- CaseStmt
+Stmt <|-- BreakStmt
+Stmt <|-- ContinueStmt
+Stmt <|-- FallthroughStmt
+Stmt <|-- FailStmt
+Stmt <|-- ThrowStmt
+
+@enduml
