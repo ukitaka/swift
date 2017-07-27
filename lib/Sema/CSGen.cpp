@@ -82,6 +82,7 @@ static bool mergeRepresentativeEquivalenceClasses(ConstraintSystem &CS,
       // new equivalence class, which is going to lead to incorrect solutions,
       // so we need to make sure to re-bind fixed to the new representative.
       if (fixedType2) {
+          std::cout << "[CSGen][mergeRepresentativeEquivalenceClasses] Bind" << std::endl;
         CS.addConstraint(ConstraintKind::Bind, fixedType2, rep1,
                          rep1->getImpl().getLocator());
       }
@@ -454,6 +455,7 @@ namespace {
                 // Since we're merging argument constraints, make sure that
                 // the representative tyvar is properly bound to the argument
                 // type.
+                  std::cout << "[CSGen][computeFavoredTypeForExpr] Bind" << std::endl;
                 CS.addConstraint(ConstraintKind::Bind,
                                  rep1,
                                  favoredTy,
@@ -1182,6 +1184,8 @@ namespace {
         return nullptr;
       
 
+      // MEMO: TypeVariableを作っている
+      // 
       auto tv = CS.createTypeVariable(CS.getConstraintLocator(expr),
                                       TVO_PrefersSubtypeBinding |
                                       TVO_CanBindToInOut);
@@ -2794,6 +2798,7 @@ namespace {
         if (!rootObjectTy || rootObjectTy->hasError())
           return Type();
         rootObjectTy = CS.openUnboundGenericType(rootObjectTy, locator);
+          std::cout << "[CSGen][visitKeyPathExpr] Bind" << std::endl;
         CS.addConstraint(ConstraintKind::Bind, root, rootObjectTy,
                          locator);
       }
@@ -3076,7 +3081,7 @@ namespace {
         }
       }
 
-      if (auto type = CG.visit(expr)) {
+      if (auto type = CG.visit(expr)) { // MEMO: ここでvisitしている。
         auto &CS = CG.getConstraintSystem();
         auto simplifiedType = CS.simplifyType(type);
 
@@ -3151,6 +3156,11 @@ namespace {
 
 } // end anonymous namespace
 
+// MEMO: 生成されるのはExprだけどどういうことだろう。
+// ConstraintWalkerがConstraintGeneratorを使って生成しているとは思うのだけど
+// ConstraintSysteはTypeCheckerを持っているので
+// CW -> CG -> CS -> TCとTCへの参照を持っていることになる
+// それで、TCへaddConstraintされる？
 Expr *ConstraintSystem::generateConstraints(Expr *expr) {
   // Remove implicit conversions from the expression.
   expr = expr->walk(SanitizeExpr(getTypeChecker()));

@@ -1818,6 +1818,8 @@ public:
 
   /// \brief Add a newly-generated constraint that is known not to be solvable
   /// right now.
+  // MEMO: ここでCG(ConstraintGraph)にaddConstraintされる。
+  //
   void addUnsolvedConstraint(Constraint *constraint) {
     // We couldn't solve this constraint; add it to the pile.
     InactiveConstraints.push_back(constraint);

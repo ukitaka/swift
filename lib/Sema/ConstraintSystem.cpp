@@ -79,6 +79,7 @@ bool ConstraintSystem::hasFreeTypeVariables() {
 }
 
 void ConstraintSystem::addTypeVariable(TypeVariableType *typeVar) {
+  // MEMO: ここでTypeVariablesへpush_back
   TypeVariables.push_back(typeVar);
   
   // Notify the constraint graph.
@@ -963,6 +964,7 @@ static void bindArchetypesFromContext(
       if (found != replacements.end()) {
         auto typeVar = found->second;
         auto contextTy = genericEnv->mapTypeIntoContext(paramTy);
+        std::cout << "[CS][bindArchetypesFromContext] Bind" << std::endl;
         cs.addConstraint(ConstraintKind::Bind, typeVar, contextTy,
                          locatorPtr);
       }
@@ -1052,6 +1054,7 @@ void ConstraintSystem::openGeneric(
     case RequirementKind::SameType: {
       auto firstTy = openType(req.getFirstType(), replacements);
       auto secondTy = openType(req.getSecondType(), replacements);
+        std::cout << "[CS][openGeneric] Bind" << std::endl;
       addConstraint(ConstraintKind::Bind, firstTy, secondTy, locatorPtr);
       break;
     }
@@ -1622,6 +1625,7 @@ void ConstraintSystem::resolveOverload(ConstraintLocator *locator,
   }
 
   // Add the type binding constraint.
+  std::cout << "[CS][resolveOverload] Bind" << std::endl;
   addConstraint(ConstraintKind::Bind, boundType, refType, locator);
 
   // Note that we have resolved this overload.

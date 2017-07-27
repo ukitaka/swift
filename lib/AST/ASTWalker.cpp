@@ -57,6 +57,7 @@
 #include "swift/AST/ASTVisitor.h"
 #include "swift/AST/ParameterList.h"
 #include "swift/AST/PrettyStackTrace.h"
+#include <iostream>
 using namespace swift;
 
 void ASTWalker::anchor() {}
@@ -94,7 +95,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   };
 
   Expr *visit(Expr *E) {
-    SetParentRAII SetParent(Walker, E);
+    SetParentRAII SetParent(Walker, E); // MEMO: WalkerのnewParentをEに設定したのちvisit
     return inherited::visit(E);
   }
 
@@ -127,10 +128,12 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   //===--------------------------------------------------------------------===//
 
   bool visitImportDecl(ImportDecl *ID) {
+      std::cout << "[Traversal][visitImportDecl]" << std::endl;
     return false;
   }
 
   bool visitExtensionDecl(ExtensionDecl *ED) {
+      std::cout << "[Traversal][visitExtensionDecl]" << std::endl;
     if (doIt(ED->getExtendedTypeLoc()))
       return true;
     for (auto &Inherit : ED->getInherited()) {
@@ -145,6 +148,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   bool visitPatternBindingDecl(PatternBindingDecl *PBD) {
+      std::cout << "[Traversal][visitPatternBindingDecl]" << std::endl;
     unsigned idx = 0U-1;
     for (auto entry : PBD->getPatternList()) {
       ++idx;
@@ -166,35 +170,42 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   bool visitEnumCaseDecl(EnumCaseDecl *ECD) {
+      std::cout << "[Traversal][visitEnumCaseDecl]" << std::endl;
     // We'll visit the EnumElementDecls separately.
     return false;
   }
 
   bool visitTopLevelCodeDecl(TopLevelCodeDecl *TLCD) {
+      std::cout << "[Traversal][visitTopLevelCodeDecl]" << std::endl;
     if (BraceStmt *S = cast_or_null<BraceStmt>(doIt(TLCD->getBody())))
       TLCD->setBody(S);
     return false;
   }
 
   bool visitIfConfigDecl(IfConfigDecl *ICD) {
+      std::cout << "[Traversal][visitIfConfigDecl]" << std::endl;
     // By default, just visit the elements that are actually
     // injected into the enclosing context.
     return false;
   }
 
   bool visitOperatorDecl(OperatorDecl *OD) {
+      std::cout << "[Traversal][visitOperatorDecl]" << std::endl;
     return false;
   }
 
   bool visitPrecedenceGroupDecl(PrecedenceGroupDecl *PGD) {
+      std::cout << "[Traversal][visitPrecedenceGroupDecl]" << std::endl;
     return false;
   }
 
   bool visitTypeAliasDecl(TypeAliasDecl *TAD) {
+      std::cout << "[Traversal][visitTypeAliasDecl]" << std::endl;
     return doIt(TAD->getUnderlyingTypeLoc());
   }
 
   bool visitAbstractTypeParamDecl(AbstractTypeParamDecl *TPD) {
+      std::cout << "[Traversal][visitAbstractTypeParamDecl]" << std::endl;
     for (auto Inherit: TPD->getInherited()) {
       if (doIt(Inherit))
         return true;
@@ -212,6 +223,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   bool visitNominalTypeDecl(NominalTypeDecl *NTD) {
+      std::cout << "[Traversal][visitNominalTypeDecl]" << std::endl;
     if (NTD->getGenericParams() &&
         Walker.shouldWalkIntoGenericParams()) {
       // Visit generic params
@@ -247,24 +259,29 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   bool visitModuleDecl(ModuleDecl *MD) {
+      std::cout << "[Traversal][visitModuleDecl]" << std::endl;
     // TODO: should we recurse within the module?
     return false;
   }
 
   bool visitVarDecl(VarDecl *VD) {
+      std::cout << "[Traversal][visitVarDecl]" << std::endl;
     return false;
   }
 
   bool visitSubscriptDecl(SubscriptDecl *SD) {
+      std::cout << "[Traversal][visitSubscriptDecl]" << std::endl;
     visit(SD->getIndices());
     return doIt(SD->getElementTypeLoc());
   }
 
   bool visitMissingMemberDecl(MissingMemberDecl *MMD) {
+      std::cout << "[Traversal][visitMissingMemberDecl]" << std::endl;
     return false;
   }
 
   bool visitAbstractFunctionDecl(AbstractFunctionDecl *AFD) {
+      std::cout << "[Traversal][visitAbstractFunctionDecl]" << std::endl;
 #ifndef NDEBUG
     PrettyStackTraceDecl debugStack("walking into body of", AFD);
 #endif
@@ -314,6 +331,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   bool visitEnumElementDecl(EnumElementDecl *ED) {
+      std::cout << "[Traversal][visitEnumElementDecl]" << std::endl;
     if (auto TR = ED->getArgumentTypeLoc().getTypeRepr()) {
       if (doIt(TR)) {
         return true;
@@ -359,26 +377,50 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
     }                                                      \
   } while (false)
 
-  Expr *visitErrorExpr(ErrorExpr *E) { return E; }
-  Expr *visitCodeCompletionExpr(CodeCompletionExpr *E) { return E; }
-  Expr *visitLiteralExpr(LiteralExpr *E) { return E; }
-  Expr *visitDiscardAssignmentExpr(DiscardAssignmentExpr *E) { return E; }
+  Expr *visitErrorExpr(ErrorExpr *E) {
+      std::cout << "[Traversal][visitErrorExpr]" << std::endl;
+      return E;
+  }
+  Expr *visitCodeCompletionExpr(CodeCompletionExpr *E) {
+      std::cout << "[Traversal][visitCodeCompletionExpr]" << std::endl;
+      return E;
+  }
+  Expr *visitLiteralExpr(LiteralExpr *E) {
+      std::cout << "[Traversal][visitLiteralExpr]" << std::endl;
+      return E;
+  }
+  Expr *visitDiscardAssignmentExpr(DiscardAssignmentExpr *E) {
+      std::cout << "[Traversal][visitDiscardAssignmentExpr]" << std::endl;
+      return E;
+  }
   Expr *visitTypeExpr(TypeExpr *E) {
+      std::cout << "[Traversal][visitTypeExpr]" << std::endl;
     if (!E->isImplicit())
       if (doIt(E->getTypeLoc()))
         return nullptr;
 
     return E;
   }
-  Expr *visitSuperRefExpr(SuperRefExpr *E) { return E; }
+  Expr *visitSuperRefExpr(SuperRefExpr *E) {
+      std::cout << "[Traversal][visitSuperRefExpr]" << std::endl;
+      return E;
+  }
   Expr *visitOtherConstructorDeclRefExpr(OtherConstructorDeclRefExpr *E) {
+      std::cout << "[Traversal][visitOtherConstructorDeclRefExpr]" << std::endl;
     return E;
   }
   
-  Expr *visitOverloadedDeclRefExpr(OverloadedDeclRefExpr *E) { return E; }
-  Expr *visitUnresolvedDeclRefExpr(UnresolvedDeclRefExpr *E) { return E; }
+  Expr *visitOverloadedDeclRefExpr(OverloadedDeclRefExpr *E) {
+      std::cout << "[Traversal][visitOverloadedDeclRefExpr]" << std::endl;
+      return E;
+  }
+  Expr *visitUnresolvedDeclRefExpr(UnresolvedDeclRefExpr *E) {
+      std::cout << "[Traversal][visitUnresolvedDeclRefExpr]" << std::endl;
+      return E;
+  }
 
-  Expr *visitUnresolvedMemberExpr(UnresolvedMemberExpr *E) { 
+  Expr *visitUnresolvedMemberExpr(UnresolvedMemberExpr *E) {
+      std::cout << "[Traversal][visitUnresolvedMemberExpr]" << std::endl;
     if (E->getArgument()) {
       if (auto arg = doIt(E->getArgument())) {
         E->setArgument(arg);
@@ -390,9 +432,13 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
     return E; 
   }
 
-  Expr *visitOpaqueValueExpr(OpaqueValueExpr *E) { return E; }
+  Expr *visitOpaqueValueExpr(OpaqueValueExpr *E) {
+      std::cout << "[Traversal][visitOpaqueValueExpr]" << std::endl;
+      return E;
+  }
 
   Expr *visitInterpolatedStringLiteralExpr(InterpolatedStringLiteralExpr *E) {
+      std::cout << "[Traversal][visitInterpolatedStringLiteralExpr]" << std::endl;
     HANDLE_SEMANTIC_EXPR(E);
 
     for (auto &Segment : E->getSegments()) {
@@ -405,6 +451,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitObjectLiteralExpr(ObjectLiteralExpr *E) {
+      std::cout << "[Traversal][visitObjectLiteralExpr]" << std::endl;
     HANDLE_SEMANTIC_EXPR(E);
 
     if (Expr *arg = E->getArg()) {
@@ -418,6 +465,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitCollectionExpr(CollectionExpr *E) {
+      std::cout << "[Traversal][visitCollectionExpr]" << std::endl;
     HANDLE_SEMANTIC_EXPR(E);
 
     for (auto &elt : E->getElements())
@@ -429,10 +477,12 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitDeclRefExpr(DeclRefExpr *E) {
+      std::cout << "[Traversal][visitDeclRefExpr]" << std::endl;
     return E;
   }
   
   Expr *visitMemberRefExpr(MemberRefExpr *E) {
+      std::cout << "[Traversal][visitMemberRefExpr]" << std::endl;
     if (Expr *Base = doIt(E->getBase())) {
       E->setBase(Base);
       return E;
@@ -441,6 +491,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitDynamicMemberRefExpr(DynamicMemberRefExpr *E) {
+      std::cout << "[Traversal][visitDynamicMemberRefExpr]" << std::endl;
     if (Expr *Base = doIt(E->getBase())) {
       E->setBase(Base);
       return E;
@@ -450,6 +501,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitAnyTryExpr(AnyTryExpr *E) {
+      std::cout << "[Traversal][visitAnyTryExpr]" << std::endl;
     if (Expr *subExpr = doIt(E->getSubExpr())) {
       E->setSubExpr(subExpr);
       return E;
@@ -458,6 +510,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitIdentityExpr(IdentityExpr *E) {
+      std::cout << "[Traversal][visitIdentityExpr]" << std::endl;
     if (Expr *subExpr = doIt(E->getSubExpr())) {
       E->setSubExpr(subExpr);
       return E;
@@ -465,6 +518,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
     return nullptr;
   }
   Expr *visitTupleExpr(TupleExpr *E) {
+      std::cout << "[Traversal][visitTupleExpr]" << std::endl;
     for (unsigned i = 0, e = E->getNumElements(); i != e; ++i)
       if (E->getElement(i)) {
         if (Expr *Elt = doIt(E->getElement(i)))
@@ -475,6 +529,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
     return E;
   }
   Expr *visitSubscriptExpr(SubscriptExpr *E) {
+      std::cout << "[Traversal][visitSubscriptExpr]" << std::endl;
     if (Expr *Base = doIt(E->getBase()))
       E->setBase(Base);
     else
@@ -488,6 +543,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
     return E;
   }
   Expr *visitKeyPathApplicationExpr(KeyPathApplicationExpr *E) {
+      std::cout << "[Traversal][visitKeyPathApplicationExpr]" << std::endl;
     if (Expr *Base = doIt(E->getBase()))
       E->setBase(Base);
     else
@@ -501,6 +557,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
     return E;
   }
   Expr *visitDynamicSubscriptExpr(DynamicSubscriptExpr *E) {
+      std::cout << "[Traversal][visitDynamicSubscriptExpr]" << std::endl;
     if (Expr *Base = doIt(E->getBase()))
       E->setBase(Base);
     else
@@ -514,6 +571,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
     return E;
   }
   Expr *visitUnresolvedDotExpr(UnresolvedDotExpr *E) {
+      std::cout << "[Traversal][visitUnresolvedDotExpr]" << std::endl;
     if (!E->getBase())
       return E;
     
@@ -524,6 +582,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
     return nullptr;
   }
   Expr *visitUnresolvedSpecializeExpr(UnresolvedSpecializeExpr *E) {
+      std::cout << "[Traversal][visitUnresolvedSpecializeExpr]" << std::endl;
     if (!E->getSubExpr())
       return E;
     
@@ -541,6 +600,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
   
   Expr *visitTupleElementExpr(TupleElementExpr *E) {
+      std::cout << "[Traversal][visitTupleElementExpr]" << std::endl;
     if (Expr *E2 = doIt(E->getBase())) {
       E->setBase(E2);
       return E;
@@ -549,6 +609,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitImplicitConversionExpr(ImplicitConversionExpr *E) {
+      std::cout << "[Traversal][visitImplicitConversionExpr]" << std::endl;
     if (Expr *E2 = doIt(E->getSubExpr())) {
       E->setSubExpr(E2);
       return E;
@@ -557,6 +618,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
   
   Expr *visitCollectionUpcastConversionExpr(CollectionUpcastConversionExpr *E) {
+      std::cout << "[Traversal][visitCollectionUpcastConversionExpr]" << std::endl;
     if (Expr *E2 = doIt(E->getSubExpr())) {
       E->setSubExpr(E2);
     } else {
@@ -589,6 +651,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
   
   Expr *visitTupleShuffleExpr(TupleShuffleExpr *E) {
+      std::cout << "[Traversal][visitTupleShuffleExpr]" << std::endl;
     if (Expr *E2 = doIt(E->getSubExpr())) {
       E->setSubExpr(E2);
     } else {
@@ -606,6 +669,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitTryExpr(TryExpr *E) {
+      std::cout << "[Traversal][visitTryExpr]" << std::endl;
     if (Expr *E2 = doIt(E->getSubExpr())) {
       E->setSubExpr(E2);
       return E;
@@ -614,6 +678,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitForceTryExpr(ForceTryExpr *E) {
+      std::cout << "[Traversal][visitForceTryExpr]" << std::endl;
     if (Expr *E2 = doIt(E->getSubExpr())) {
       E->setSubExpr(E2);
       return E;
@@ -622,6 +687,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitOptionalTryExpr(OptionalTryExpr *E) {
+      std::cout << "[Traversal][visitOptionalTryExpr]" << std::endl;
     if (Expr *E2 = doIt(E->getSubExpr())) {
       E->setSubExpr(E2);
       return E;
@@ -630,6 +696,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitInOutExpr(InOutExpr *E) {
+      std::cout << "[Traversal][visitInOutExpr]" << std::endl;
     if (Expr *E2 = doIt(E->getSubExpr())) {
       E->setSubExpr(E2);
       return E;
@@ -638,6 +705,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
   
   Expr *visitSequenceExpr(SequenceExpr *E) {
+      std::cout << "[Traversal][visitSequenceExpr]" << std::endl;
     for (unsigned i = 0, e = E->getNumElements(); i != e; ++i)
       if (Expr *Elt = doIt(E->getElement(i)))
         E->setElement(i, Elt);
@@ -647,6 +715,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitDynamicTypeExpr(DynamicTypeExpr *E) {
+      std::cout << "[Traversal][visitDynamicTypeExpr]" << std::endl;
     Expr *base = E->getBase();
     if ((base = doIt(base)))
       E->setBase(base);
@@ -657,6 +726,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitCaptureListExpr(CaptureListExpr *expr) {
+      std::cout << "[Traversal][visitCaptureListExpr]" << std::endl;
     for (auto c : expr->getCaptureList()) {
       if (doIt(c.Var) || doIt(c.Init))
         return nullptr;
@@ -671,6 +741,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitClosureExpr(ClosureExpr *expr) {
+      std::cout << "[Traversal][visitClosureExpr]" << std::endl;
     visit(expr->getParameters());
 
     if (expr->hasExplicitResultType())
@@ -695,6 +766,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitAutoClosureExpr(AutoClosureExpr *E) {
+      std::cout << "[Traversal][visitAutoClosureExpr]" << std::endl;
     if (Expr *E2 = doIt(E->getSingleExpressionBody())) {
       E->setBody(E2);
       return E;
@@ -703,6 +775,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
   
   Expr *visitApplyExpr(ApplyExpr *E) {
+      std::cout << "[Traversal][visitApplyExpr]" << std::endl;
     if (E->getFn()) {
       Expr *E2 = doIt(E->getFn());
       if (E2 == nullptr) return nullptr;
@@ -724,6 +797,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitSelfApplyExpr(SelfApplyExpr *E) {
+      std::cout << "[Traversal][visitSelfApplyExpr]" << std::endl;
     if (E->getBase()) {
       Expr *E2 = doIt(E->getBase());
       if (E2 == nullptr) return nullptr;
@@ -740,6 +814,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitDotSyntaxBaseIgnoredExpr(DotSyntaxBaseIgnoredExpr *E) {
+      std::cout << "[Traversal][visitDotSyntaxBaseIgnoredExpr]" << std::endl;
     Expr *E2 = doIt(E->getLHS());
     if (E2 == nullptr) return nullptr;
     E->setLHS(E2);
@@ -751,6 +826,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitExplicitCastExpr(ExplicitCastExpr *E) {
+      std::cout << "[Traversal][visitExplicitCastExpr]" << std::endl;
     if (Expr *Sub = E->getSubExpr()) {
       Sub = doIt(Sub);
       if (!Sub) return nullptr;
@@ -764,6 +840,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitArrowExpr(ArrowExpr *E) {
+      std::cout << "[Traversal][visitArrowExpr]" << std::endl;
     if (Expr *Args = E->getArgsExpr()) {
       Args = doIt(Args);
       if (!Args) return nullptr;
@@ -778,6 +855,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitRebindSelfInConstructorExpr(RebindSelfInConstructorExpr *E) {
+      std::cout << "[Traversal][visitRebindSelfInConstructorExpr]" << std::endl;
     Expr *Sub = doIt(E->getSubExpr());
     if (!Sub) return nullptr;
     E->setSubExpr(Sub);
@@ -786,6 +864,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
   
   Expr *visitAssignExpr(AssignExpr *AE) {
+      std::cout << "[Traversal][visitAssignExpr]" << std::endl;
     if (Expr *Dest = AE->getDest()) {
       if (!(Dest = doIt(Dest)))
         return nullptr;
@@ -802,6 +881,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
   
   Expr *visitEnumIsCaseExpr(EnumIsCaseExpr *E) {
+      std::cout << "[Traversal][visitEnumIsCaseExpr]" << std::endl;
     if (Expr *Sub = E->getSubExpr()) {
       if (!(Sub = doIt(Sub)))
         return nullptr;
@@ -813,6 +893,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   
   
   Expr *visitIfExpr(IfExpr *E) {
+      std::cout << "[Traversal][visitIfExpr]" << std::endl;
     if (Expr *Cond = E->getCondExpr()) {
       Cond = doIt(Cond);
       if (!Cond) return nullptr;
@@ -833,6 +914,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitUnresolvedPatternExpr(UnresolvedPatternExpr *E) {
+      std::cout << "[Traversal][visitUnresolvedPatternExpr]" << std::endl;
     Pattern *sub = doIt(E->getSubPattern());
     if (!sub) return nullptr;
     
@@ -841,6 +923,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitBindOptionalExpr(BindOptionalExpr *E) {
+      std::cout << "[Traversal][visitBindOptionalExpr]" << std::endl;
     Expr *sub = doIt(E->getSubExpr());
     if (!sub) return nullptr;
 
@@ -849,6 +932,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitOptionalEvaluationExpr(OptionalEvaluationExpr *E) {
+      std::cout << "[Traversal][visitOptionalEvaluationExpr]" << std::endl;
     Expr *sub = doIt(E->getSubExpr());
     if (!sub) return nullptr;
 
@@ -857,6 +941,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitForceValueExpr(ForceValueExpr *E) {
+      std::cout << "[Traversal][visitForceValueExpr]" << std::endl;
     Expr *sub = doIt(E->getSubExpr());
     if (!sub) return nullptr;
 
@@ -865,6 +950,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitOpenExistentialExpr(OpenExistentialExpr *E) {
+      std::cout << "[Traversal][visitOpenExistentialExpr]" << std::endl;
     Expr *existential = doIt(E->getExistentialValue());
     if (!existential) return nullptr;
 
@@ -877,6 +963,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitMakeTemporarilyEscapableExpr(MakeTemporarilyEscapableExpr *E) {
+      std::cout << "[Traversal][visitMakeTemporarilyEscapableExpr]" << std::endl;
     Expr *closure = doIt(E->getNonescapingClosureValue());
     if (!closure) return nullptr;
 
@@ -889,11 +976,13 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
   
   Expr *visitEditorPlaceholderExpr(EditorPlaceholderExpr *E) {
+      std::cout << "[Traversal][visitEditorPlaceholderExpr]" << std::endl;
     HANDLE_SEMANTIC_EXPR(E);
     return E;
   }
 
   Expr *visitObjCSelectorExpr(ObjCSelectorExpr *E) {
+      std::cout << "[Traversal][visitObjCSelectorExpr]" << std::endl;
     Expr *sub = doIt(E->getSubExpr());
     if (!sub) return nullptr;
 
@@ -902,6 +991,7 @@ class Traversal : public ASTVisitor<Traversal, Expr*, Stmt*,
   }
 
   Expr *visitKeyPathExpr(KeyPathExpr *E) {
+      std::cout << "[Traversal][visitKeyPathExpr]" << std::endl;
     // For an ObjC key path, the string literal expr serves as the semantic
     // expression.
     if (auto objcStringLiteral = E->getObjCStringLiteralExpr()) {

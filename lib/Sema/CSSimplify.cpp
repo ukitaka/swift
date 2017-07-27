@@ -2760,6 +2760,7 @@ ConstraintSystem::simplifyOptionalObjectConstraint(
     objectTy = LValueType::get(objectTy);
 
   // Equate it to the other type in the constraint.
+    std::cout << "[CSSimplify][simplifyOptionalObjectConstraint] Bind" << std::endl;
   addConstraint(ConstraintKind::Bind, objectTy, second, locator);
   return SolutionKind::Solved;
 }
@@ -3631,6 +3632,8 @@ ConstraintSystem::simplifyBridgingConstraint(Type type1,
       if (auto fromBGT = unwrappedToType->getAs<BoundGenericType>()) {
         if (fromBGT->getDecl() == TC.Context.getArrayDecl()) {
           // [AnyObject]
+            
+            std::cout << "[CSSimplify][simplifyBridgingConstraint1] Bind" << std::endl;
           addConstraint(ConstraintKind::Bind, fromBGT->getGenericArgs()[0],
                         TC.Context.getAnyObjectType(),
                         getConstraintLocator(
@@ -3644,12 +3647,14 @@ ConstraintSystem::simplifyBridgingConstraint(Type type1,
             return SolutionKind::Error;
           }
 
+            std::cout << "[CSSimplify][simplifyBridgingConstraint2] Bind" << std::endl;
           addConstraint(ConstraintKind::Bind, fromBGT->getGenericArgs()[0],
                         NSObjectType,
                         getConstraintLocator(
                           locator.withPathElement(
                             LocatorPathElt::getGenericArgument(0))));
 
+            std::cout << "[CSSimplify][simplifyBridgingConstraint3] Bind" << std::endl;
           addConstraint(ConstraintKind::Bind, fromBGT->getGenericArgs()[1],
                         TC.Context.getAnyObjectType(),
                         getConstraintLocator(

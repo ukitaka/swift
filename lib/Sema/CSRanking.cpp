@@ -19,6 +19,7 @@
 #include "swift/AST/ParameterList.h"
 #include "llvm/ADT/Statistic.h"
 #include "llvm/Support/Compiler.h"
+#include <iostream>
 
 using namespace swift;
 using namespace constraints;
@@ -450,6 +451,7 @@ static bool isProtocolExtensionAsSpecializedAs(TypeChecker &tc,
   // opening 'Self' of the second extension.
   Type selfType1 = sig1->getGenericParams()[0];
   Type selfType2 = sig2->getGenericParams()[0];
+    std::cout << "[CSRanking][isProtocolExtensionAsSpecializedAs] Bind" << std::endl;
   cs.addConstraint(ConstraintKind::Bind,
                    replacements[cast<GenericTypeParamType>(selfType2->getCanonicalType())],
                    dc1->mapTypeIntoContext(selfType1),
@@ -615,6 +617,7 @@ static bool isDeclAsSpecializedAs(TypeChecker &tc, DeclContext *dc,
 
       for (const auto &replacement : replacements) {
         if (auto mapped = innerDC1->mapTypeIntoContext(replacement.first)) {
+            std::cout << "[CSRanking][isDeclAsSpecializedAs] Bind" << std::endl;
           cs.addConstraint(ConstraintKind::Bind, replacement.second, mapped,
                            locator);
         }

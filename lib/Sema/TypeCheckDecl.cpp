@@ -4094,7 +4094,7 @@ public:
     if (!IsFirstPass) {
       for (unsigned i = 0, e = PBD->getNumPatternEntries(); i != e; ++i) {
         if (!PBD->isInitializerChecked(i) && PBD->getInit(i))
-          TC.typeCheckPatternBinding(PBD, i, /*skipApplyingSolution*/false);
+          TC.typeCheckPatternBinding(PBD, i, /*skipApplyingSolution*/false); // MEMO: ここでTYPECHEK
       }
     }
 

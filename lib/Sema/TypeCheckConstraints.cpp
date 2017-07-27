@@ -1657,7 +1657,7 @@ solveForExpression(Expr *&expr, DeclContext *dc, Type convertType,
   auto solution = cs.solve(expr,
                            convertType,
                            listener,
-                           viable,
+                           viable, // MEMO: これが`solutions` にあたる。 ここにいれられる。
                            allowFreeTypeVariables);
 
   // The constraint system has failed
@@ -1673,7 +1673,7 @@ solveForExpression(Expr *&expr, DeclContext *dc, Type convertType,
       return true;
 
     // Try to provide a decent diagnostic.
-    if (cs.salvage(viable, expr)) {
+    if (cs.salvage(viable, expr)) { // MEMO: salvageはなんか使っていたような
       // If salvage produced an error message, then it failed to salvage the
       // expression, just bail out having reported the error.
       return true;
@@ -1823,6 +1823,8 @@ bool TypeChecker::typeCheckExpression(Expr *&expr, DeclContext *dc,
 
   // MEMO: このsolveForExpressionでlistenerの`builtConstraints` が呼ばれて制約が生成される。
   // MEMO: 実際 let a = 2の例で、ConversionのConstraintが生成されるのはこのタイミング
+  // MEMO: typeCheckExpressionからこの関数へ
+  // MEMO: viableがsolutionsに当たる
   if (solveForExpression(expr, dc, convertType.getType(),
                          allowFreeTypeVariables, listener, cs, viable, options))
     return true;
@@ -2179,6 +2181,8 @@ bool TypeChecker::typeCheckBinding(Pattern *&pattern, Expr *&initializer,
         return true;
 
       // Add a conversion constraint between the types.
+      // MEMO: ConstraintKind::Conversionはここで生成
+      // その際、first (ここでいうgetType)はTypeVariableになる
       cs.addConstraint(ConstraintKind::Conversion, cs.getType(expr),
                        InitType, Locator, /*isFavored*/true);
 
@@ -2212,7 +2216,7 @@ bool TypeChecker::typeCheckBinding(Pattern *&pattern, Expr *&initializer,
   };
 
   assert(initializer && "type-checking an uninitialized binding?");
-  BindingListener listener(pattern, initializer);
+  BindingListener listener(pattern, initializer); // MEMO: ここで上の`BindingListener` を作る
 
   TypeLoc contextualType;
   auto contextualPurpose = CTP_Unused;
@@ -2519,7 +2523,7 @@ Type ConstraintSystem::computeAssignDestType(Expr *dest, SourceLoc equalLoc) {
     auto objectTv = createTypeVariable(getConstraintLocator(dest),
                                        /*options=*/0);
 
-    // MEMO: ここでBindを生成？
+    // MEMO: ここでBindを生成？ → ここではないっぽい
     std::cout << "[CS][addKind]" << std::endl;
     auto refTv = LValueType::get(objectTv);
     addConstraint(ConstraintKind::Bind, typeVar, refTv,

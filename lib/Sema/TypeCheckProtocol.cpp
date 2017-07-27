@@ -44,6 +44,7 @@
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/SaveAndRestore.h"
+#include <iostream>
 
 #define DEBUG_TYPE "protocol-conformance-checking"
 #include "llvm/Support/Debug.h"
@@ -1162,6 +1163,7 @@ matchWitness(TypeChecker &tc,
         replacedInReq = reqGenericEnv->mapTypeIntoContext(replacedInReq);
       }
 
+      std::cout << "[TCP][matchWitness] Bind" << std::endl;
       cs->addConstraint(ConstraintKind::Bind, replacement.second, replacedInReq,
                         reqLocator);
     }

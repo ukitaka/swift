@@ -47,6 +47,7 @@ STATISTIC(TotalNumTypeVariables, "# of type variables created");
 #include "ConstraintSolverStats.def"
 STATISTIC(LargestSolutionAttemptNumber, "# of the largest solution attempt");
 
+// MEMO: createTypeVariables. addTypeVariablesを呼ぶ
 TypeVariableType *ConstraintSystem::createTypeVariable(
                                      ConstraintLocator *locator,
                                      unsigned options) {
@@ -630,6 +631,8 @@ bool ConstraintSystem::tryTypeVariableBindings(
 
       // FIXME: We want the locator that indicates where the binding came
       // from.
+      // MEMO: ここで let a = 2の場合の制約が生成されていた
+        std::cout << "[CSSolver][tryTypeVariableBindings] Bind" << std::endl;
       addConstraint(ConstraintKind::Bind, typeVar, type,
                     typeVar->getImpl().getLocator());
 
@@ -1339,6 +1342,8 @@ ConstraintSystem::solve(Expr *&expr,
   }
 
   // Try to solve the constraint system using computed suggestions.
+  // MEMO: ここでtryTypeVariableBindingsへとたどり着く
+  // MEMO: それで、ConstraintKind::Bindが生成される
   solve(solutions, allowFreeTypeVariables);
 
   // If there are no solutions let's mark system as unsolved,
@@ -1372,6 +1377,7 @@ bool ConstraintSystem::solve(SmallVectorImpl<Solution> &solutions,
       return true;
 
   // Solve the system.
+  // MEMO: 上のsolveから呼ばれ、最終的にtryTypeVariableBindingsを呼ぶ
   solveRec(solutions, allowFreeTypeVariables);
 
   // Filter deduced solutions, try to figure out if there is
@@ -1413,7 +1419,7 @@ bool ConstraintSystem::solveRec(SmallVectorImpl<Solution> &solutions,
         << "(found solution " << CurrentScore << ")\n";
     }
 
-    solutions.push_back(std::move(solution));
+    solutions.push_back(std::move(solution)); // MEMO: こんな感じでSolutionsに解がいれられる
     return false;
   }
 
@@ -1431,6 +1437,7 @@ bool ConstraintSystem::solveRec(SmallVectorImpl<Solution> &solutions,
   // If we don't have more than one component, just solve the whole
   // system.
   if (numComponents < 2) {
+    // MEMO: solveSimplified は tryTypeVariableBindingsを呼ぶ。
     return solveSimplified(solutions, allowFreeTypeVariables);
   }
 
@@ -1494,7 +1501,7 @@ bool ConstraintSystem::solveRec(SmallVectorImpl<Solution> &solutions,
 
   // Compute the partial solutions produced for each connected component.
   std::unique_ptr<SmallVector<Solution, 4>[]> 
-    partialSolutions(new SmallVector<Solution, 4>[numComponents]);
+    partialSolutions(new SmallVector<Solution, 4>[numComponents]); // MEMO: 部分解？
   Optional<Score> PreviousBestScore = solverState->BestScore;
   for (unsigned component = 0; component != numComponents; ++component) {
     assert(InactiveConstraints.empty() && 
@@ -1539,6 +1546,7 @@ bool ConstraintSystem::solveRec(SmallVectorImpl<Solution> &solutions,
       llvm::SaveAndRestore<SolverScope *> 
         partialSolutionScope(solverState->PartialSolutionScope, &scope);
 
+    // MEMO: solveSimplified は tryTypeVariableBindingsを呼ぶ。
       failed = solveSimplified(partialSolutions[component], 
                                allowFreeTypeVariables);
     }
@@ -1618,7 +1626,7 @@ bool ConstraintSystem::solveRec(SmallVectorImpl<Solution> &solutions,
       }
 
       // Save this solution.
-      solutions.push_back(std::move(solution));
+      solutions.push_back(std::move(solution)); // MEMO: solution.push_back
 
       anySolutions = true;
     }
@@ -1709,7 +1717,7 @@ bool ConstraintSystem::solveSimplified(
 
   TypeVariableType *bestTypeVar = nullptr;
   PotentialBindings bestBindings;
-  std::tie(bestBindings, bestTypeVar) = determineBestBindings();
+  std::tie(bestBindings, bestTypeVar) = determineBestBindings(); // MEMO: 大事そう。ここでなににBindするか決めている
 
   // If we have a binding that does not involve type variables, or we have
   // no other option, go ahead and try the bindings for this type variable.
@@ -1717,6 +1725,7 @@ bool ConstraintSystem::solveSimplified(
       (disjunctions.empty() ||
        (!bestBindings.InvolvesTypeVariables && !bestBindings.FullyBound &&
         bestBindings.LiteralBinding == LiteralBindingKind::None))) {
+    // MEMO: ここでBindが生成される
     return tryTypeVariableBindings(solverState->depth, bestTypeVar,
                                    bestBindings.Bindings, solutions,
                                    allowFreeTypeVariables);

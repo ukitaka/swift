@@ -1676,6 +1676,7 @@ namespace {
       return expr;
     }
 
+    // MEMO: !!! ここで整数リテラルのハンドリングがされる。
     Expr *handleIntegerLiteralExpr(LiteralExpr *expr) {
       // If the literal has been assigned a builtin integer type,
       // don't mess with it.
@@ -6328,6 +6329,7 @@ ExprRewriter::coerceObjectArgumentToType(Expr *expr,
                                           /*isImplicit*/ true));
 }
 
+// MEMO: リテラルはここで具体的な型になる？
 Expr *ExprRewriter::convertLiteral(Expr *literal,
                                    Type type,
                                    Type openedType,

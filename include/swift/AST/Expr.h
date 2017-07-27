@@ -4351,8 +4351,8 @@ public:
 
 /// AssignExpr - A value assignment, like "x = y".
 class AssignExpr : public Expr {
-  Expr *Dest;
-  Expr *Src;
+  Expr *Dest; // MEMO: lhsのこと。ParseExpr.cpp参照
+  Expr *Src; // MEMO: rhsのこと。ParseExpr.cpp参照
   SourceLoc EqualLoc;
 
 public:  

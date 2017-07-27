@@ -1,2 +1,2 @@
-let a: String = "123"
+let a = 123
 
