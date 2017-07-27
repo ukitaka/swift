@@ -1761,11 +1761,13 @@ Type ConstraintSystem::simplifyType(Type type) {
       });
 }
 
+// MEMO: handleIntegerLiteralExpr より。
 Type Solution::simplifyType(Type type) const {
-  if (!type->hasTypeVariable())
+  if (!type->hasTypeVariable()) // 具体的な型が分かっている場合はそのまま返す
     return type;
 
   // Map type variables to fixed types from bindings.
+  // そうでない場合はtypeBindingsから返すっぽい
   return simplifyTypeImpl(
       getConstraintSystem(), type,
       [&](TypeVariableType *tvt) -> Type {

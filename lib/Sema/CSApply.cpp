@@ -1693,7 +1693,7 @@ namespace {
 
       // For type-sugar reasons, prefer the spelling of the default literal
       // type.
-      auto type = simplifyType(cs.getType(expr));
+      auto type = simplifyType(cs.getType(expr)); // MEMO: ここでsimplifyされている。
       if (auto defaultType = tc.getDefaultType(protocol, dc)) {
         if (defaultType->isEqual(type))
           type = defaultType;
@@ -1735,14 +1735,14 @@ namespace {
                                { tc.Context.Id_builtinIntegerLiteral });
 
       return convertLiteral(
-               expr,
+               expr, // MEMO: 1など
                type,
                cs.getType(expr),
-               protocol,
+               protocol, // ExpressibleByIntegerLiteral
                tc.Context.Id_IntegerLiteralType,
                initName,
-               builtinProtocol,
-               maxType,
+               builtinProtocol, // ExpressibleByBuiltinIntegerLiteral
+               maxType, // MEMO: たぶんこれがInt2048
                builtinInitName,
                nullptr,
                diag::integer_literal_broken_proto,
