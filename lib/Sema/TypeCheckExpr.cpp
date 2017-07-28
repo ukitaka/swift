@@ -559,6 +559,8 @@ static Type lookupDefaultLiteralType(TypeChecker &TC, DeclContext *dc,
   return cast<TypeAliasDecl>(TD)->getDeclaredInterfaceType();
 }
 
+// MEMO: ここでExpressibleByIntegerLiteral -> IntegerLiteralTypeがされていそう。
+// どこから呼ばれている？
 Type TypeChecker::getDefaultType(ProtocolDecl *protocol, DeclContext *dc) {
   Type *type = nullptr;
   const char *name = nullptr;
@@ -594,7 +596,7 @@ Type TypeChecker::getDefaultType(ProtocolDecl *protocol, DeclContext *dc) {
   else if (protocol == getProtocol(
                          SourceLoc(),
                          KnownProtocolKind::ExpressibleByIntegerLiteral)) {
-    type = &IntLiteralType;
+    type = &IntLiteralType; // MEMO: ここでIntが返されている。
     name = "IntegerLiteralType";
   }
   // ExpressibleByFloatLiteral -> FloatLiteralType

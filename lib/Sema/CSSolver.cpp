@@ -571,7 +571,7 @@ bool ConstraintSystem::tryTypeVariableBindings(
       if (binding.isDefaultableBinding() && anySolved)
         continue;
 
-      auto type = binding.BindingType;
+      auto type = binding.BindingType; // LiteralBinding？だっけ？
 
       // If the type variable can't bind to an lvalue, make sure the
       // type we pick isn't an lvalue.
@@ -632,8 +632,11 @@ bool ConstraintSystem::tryTypeVariableBindings(
       // FIXME: We want the locator that indicates where the binding came
       // from.
       // MEMO: ここで let a = 2の場合の制約が生成されていた
+      // MEMO: 結局、determineBestBindingsで決められたTypeVarとBindingがそのまま使われている
+      // TypeVarはいいとして、typeがIntに決まっているのはどこで？？？ ->  getPotentialBindingの時点で。
+        // type = IntegerLiteralType
         std::cout << "[CSSolver][tryTypeVariableBindings] Bind" << std::endl;
-      addConstraint(ConstraintKind::Bind, typeVar, type,
+      addConstraint(ConstraintKind::Bind, typeVar, type, 
                     typeVar->getImpl().getLocator());
 
       // If this was from a defaultable binding note that.
@@ -641,6 +644,7 @@ bool ConstraintSystem::tryTypeVariableBindings(
         DefaultedConstraints.push_back(binding.DefaultableBinding);
       }
 
+      // MEMO: 制約を追加した上で、もう一度solveRecを繰り返す。
       if (!solveRec(solutions, allowFreeTypeVariables))
         anySolved = true;
 
@@ -1341,9 +1345,14 @@ ConstraintSystem::solve(Expr *&expr,
     print(log);
   }
 
+    // MEMO: --------ここまでは制約を追加するのみ----------
+    // MEMO: --------ここからは追加した制約を元にsolveしていく-----
+    // MEMO: --------必要であればaddConstraintする----
+
   // Try to solve the constraint system using computed suggestions.
   // MEMO: ここでtryTypeVariableBindingsへとたどり着く
   // MEMO: それで、ConstraintKind::Bindが生成される
+  // MEMO: solutionsに結果がいれられる。複雑すぎるか、答えがない場合はNG
   solve(solutions, allowFreeTypeVariables);
 
   // If there are no solutions let's mark system as unsolved,
@@ -1438,7 +1447,7 @@ bool ConstraintSystem::solveRec(SmallVectorImpl<Solution> &solutions,
   // system.
   if (numComponents < 2) {
     // MEMO: solveSimplified は tryTypeVariableBindingsを呼ぶ。
-    return solveSimplified(solutions, allowFreeTypeVariables);
+    return solveSimplified(solutions, allowFreeTypeVariables); // MEMO: solution!!!!!!!!!
   }
 
   if (TC.Context.LangOpts.DebugConstraintSolver) {
@@ -1626,7 +1635,7 @@ bool ConstraintSystem::solveRec(SmallVectorImpl<Solution> &solutions,
       }
 
       // Save this solution.
-      solutions.push_back(std::move(solution)); // MEMO: solution.push_back
+      solutions.push_back(std::move(solution)); // MEMO: !!!!!!!! solution.push_back
 
       anySolutions = true;
     }
@@ -1727,7 +1736,7 @@ bool ConstraintSystem::solveSimplified(
         bestBindings.LiteralBinding == LiteralBindingKind::None))) {
     // MEMO: ここでBindが生成される
     return tryTypeVariableBindings(solverState->depth, bestTypeVar,
-                                   bestBindings.Bindings, solutions,
+                                   bestBindings.Bindings, solutions, // MEMO: !!!!! solutions
                                    allowFreeTypeVariables);
   }
 
@@ -1761,7 +1770,7 @@ bool ConstraintSystem::solveSimplified(
       log.indent(solverState->depth * 2) << "(found solution)\n";
     }
 
-    solutions.push_back(std::move(solution));
+    solutions.push_back(std::move(solution)); // MEMO: !!!!! solutions
     return false;
   }
 

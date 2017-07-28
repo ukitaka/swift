@@ -1274,7 +1274,7 @@ namespace {
     /// \param locator The locator used to refer to the subscript.
     /// \param isImplicit Whether this is an implicit subscript.
     Expr *buildSubscript(Expr *base, Expr *index,
-                         ArrayRef<Identifier> argLabels,
+                         ArrayRef<Identifier> argBuildConstraintsls,
                          bool hasTrailingClosure,
                          ConstraintLocatorBuilder locator,
                          bool isImplicit, AccessSemantics semantics) {
@@ -1694,7 +1694,7 @@ namespace {
       // For type-sugar reasons, prefer the spelling of the default literal
       // type.
       auto type = simplifyType(cs.getType(expr)); // MEMO: ここでsimplifyされている。
-      if (auto defaultType = tc.getDefaultType(protocol, dc)) {
+      if (auto defaultType = tc.getDefaultType(protocol, dc)) { // MEMO: ここでExpressibleByIntegerLiteralがIntに解決される。
         if (defaultType->isEqual(type))
           type = defaultType;
       }

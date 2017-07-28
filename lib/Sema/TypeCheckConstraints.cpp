@@ -1814,6 +1814,7 @@ bool TypeChecker::typeCheckExpression(Expr *&expr, DeclContext *dc,
 
   // If the client can handle unresolved type variables, leave them in the
   // system.
+  // MEMO: ここでallowFreeTypeVariablesが決められている
   auto allowFreeTypeVariables = FreeTypeVariableBinding::Disallow;
   if (options.contains(TypeCheckExprFlags::AllowUnresolvedTypeVariables))
     allowFreeTypeVariables = FreeTypeVariableBinding::UnresolvedType;

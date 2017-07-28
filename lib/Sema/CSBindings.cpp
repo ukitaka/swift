@@ -27,10 +27,13 @@ ConstraintSystem::determineBestBindings() {
   PotentialBindings bestBindings;
   for (auto typeVar : getTypeVariables()) {
     // Skip any type variables that are bound.
+    // MEMO: Bind済みならskip
     if (typeVar->getImpl().hasRepresentativeOrFixed())
       continue;
 
     // Get potential bindings.
+    // MEMO: Conversionの場合はnullが帰ってくる
+    // MEMO: LiteralConformsToの場合はbindingが帰ってくる
     auto bindings = getPotentialBindings(typeVar);
     if (!bindings)
       continue;
@@ -169,7 +172,7 @@ ConstraintSystem::getPotentialBindings(TypeVariableType *typeVar) {
       lastSupertypeIndex = result.Bindings.size();
     }
 
-    result.Bindings.push_back(std::move(binding));
+    result.Bindings.push_back(std::move(binding)); // MEMO: ここでpush_back
   };
 
   // Consider each of the constraints related to this type variable.
@@ -246,7 +249,7 @@ ConstraintSystem::getPotentialBindings(TypeVariableType *typeVar) {
 
       // If there is a default literal type for this protocol, it's a
       // potential binding.
-      auto defaultType = tc.getDefaultType(constraint->getProtocol(), DC);
+      auto defaultType = tc.getDefaultType(constraint->getProtocol(), DC); // MEMO: ここでExpressibleByIntegerLiteral -> Intが解決
       if (!defaultType)
         continue;
 
@@ -259,8 +262,9 @@ ConstraintSystem::getPotentialBindings(TypeVariableType *typeVar) {
         if (!exactTypes.insert(defaultType->getCanonicalType()).second)
           continue;
 
-        result.foundLiteralBinding(constraint->getProtocol());
-        addPotentialBinding({defaultType, AllowedBindingKind::Subtypes,
+        result.foundLiteralBinding(constraint->getProtocol()); // MEMO: たぶんここで結果がいれられる。
+        // DefaultTypeがpotentialBindings になる。
+        addPotentialBinding({defaultType, AllowedBindingKind::Subtypes, // MEMO: resultにpush_backされる
                              constraint->getProtocol()});
         continue;
       }
