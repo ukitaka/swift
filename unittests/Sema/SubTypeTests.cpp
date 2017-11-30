@@ -60,14 +60,20 @@ TEST(Sema, Type) {
     auto *animalProtocol = C.makeProtocol(&DC, "Animal");
     ProtocolType *animalTy = ProtocolType::get(animalProtocol, Type(), C.Ctx);
     Type ty = animalTy;
-    CanType cty = ty->getCanonicalType();
     EXPECT_TRUE(animalTy->getKind() == TypeKind::Protocol);
     EXPECT_TRUE(ty->getKind() == TypeKind::Protocol);
-    EXPECT_TRUE(cty->getKind() == TypeKind::Protocol);
     EXPECT_TRUE(animalTy->isExistentialType());
     EXPECT_TRUE(ty->isExistentialType());
-    EXPECT_TRUE(cty->isExistentialType());
+}
 
-    CanType cty2 = ty->getCanonicalType();
-    EXPECT_TRUE(cty == cty2);
+TEST(Sema, ThrowFunc) {
+    auto InputType = C.makeNominal<StructDecl>("A")->getDeclaredType();
+    auto ResultType = C.makeNominal<StructDecl>("B")->getDeclaredType();
+    const AnyFunctionType::ExtInfo InfoForThrowFunc = AnyFunctionType::ExtInfo(AnyFunctionType::Representation::Swift, true);
+    const AnyFunctionType::ExtInfo InfoForNonThrowFunc = AnyFunctionType::ExtInfo(AnyFunctionType::Representation::Swift, false);
+
+    auto NonThrowFuncType = FunctionType::get(InputType, ResultType, InfoForNonThrowFunc);
+    auto ThrowFuncType = FunctionType::get(InputType, ResultType, InfoForThrowFunc);
+    EXPECT_FALSE(TC->isSubtypeOf(ThrowFuncType, NonThrowFuncType, &DC));
+    EXPECT_TRUE(TC->isSubtypeOf(NonThrowFuncType, ThrowFuncType, &DC));
 }

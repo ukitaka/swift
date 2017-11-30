@@ -34,7 +34,6 @@ public:
 
   TestContextBase() : Diags(SourceMgr) {
     LangOpts.Target = llvm::Triple(llvm::sys::getProcessTriple());
-    LangOpts.EnableUkitakaDebug = true;
   }
 };
 
