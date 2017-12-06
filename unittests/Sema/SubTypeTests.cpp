@@ -50,6 +50,7 @@ TEST(Sema, Protocol) {
     dogStruct->registerProtocolConformance(conformance);
 
     EXPECT_TRUE(TC->conformsToProtocol(dogTy, animalProtocol, &DC, ConformanceCheckFlags::InExpression));
+    EXPECT_FALSE(TC->conformsToProtocol(animalTy, animalProtocol, &DC, ConformanceCheckFlags::InExpression));
     EXPECT_TRUE(TC->isSubtypeOf(dogTy, ty, &DC));
     EXPECT_TRUE(TC->isConvertibleTo(dogTy, ty, &DC));
 }
