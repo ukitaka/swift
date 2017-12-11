@@ -6402,6 +6402,7 @@ public:
     UNINTERESTING_ATTR(SwiftNativeObjCRuntimeBase)
     UNINTERESTING_ATTR(ShowInInterface)
     UNINTERESTING_ATTR(Specialize)
+    UNINTERESTING_ATTR(Sealed)
 
     // These can't appear on overridable declarations.
     UNINTERESTING_ATTR(Prefix)

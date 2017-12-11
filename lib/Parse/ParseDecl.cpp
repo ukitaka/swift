@@ -1182,6 +1182,7 @@ bool Parser::parseNewDeclAttribute(DeclAttributes &Attributes, SourceLoc AtLoc,
       case IsInvalid:
         llvm_unreachable("handled above");
       }
+
     }
 
     if (!AnyAnnotations) {
@@ -1352,6 +1353,9 @@ bool Parser::parseNewDeclAttribute(DeclAttributes &Attributes, SourceLoc AtLoc,
       Attributes.add(Attr.get());
     }
     break;
+  }
+  case DAK_Sealed: {
+    //TODO-ukitaka: implement
   }
   }
 
@@ -2496,6 +2500,12 @@ Parser::parseDecl(ParseDeclOptions Flags,
       if (auto *D = DeclResult.getPtrOrNull())
         markWasHandled(D);
       break;
+    }
+
+    case tok::kw_sealed: {
+      SyntaxParsingContext ModContext(SyntaxContext, SyntaxKind::DeclModifier);
+      parseNewDeclAttribute(Attributes, /*AtLoc=*/{}, DAK_Sealed);
+      continue;
     }
 
     case tok::code_complete:
