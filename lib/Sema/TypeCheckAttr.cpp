@@ -256,6 +256,7 @@ public:
   bool visitAbstractAccessControlAttr(AbstractAccessControlAttr *attr);
   void visitSILStoredAttr(SILStoredAttr *attr);
   void visitObjCMembersAttr(ObjCMembersAttr *attr);
+  void visitSealedAttr(SealedAttr *attr);
 };
 } // end anonymous namespace
 
@@ -705,6 +706,10 @@ void AttributeEarlyChecker::visitObjCMembersAttr(ObjCMembersAttr *attr) {
     return diagnoseAndRemoveAttr(attr, diag::objcmembers_attribute_nonclass);
 }
 
+void AttributeEarlyChecker::visitSealedAttr(SealedAttr *attr) {
+  //TODO-ukitaka: implement
+}
+
 void TypeChecker::checkDeclAttributesEarly(Decl *D) {
   // Don't perform early attribute validation more than once.
   // FIXME: Crummy way to get idempotency.
@@ -873,6 +878,7 @@ public:
 
   void visitDiscardableResultAttr(DiscardableResultAttr *attr);
   void visitImplementsAttr(ImplementsAttr *attr);
+  void visitSealedAttr(SealedAttr *attr);
 };
 } // end anonymous namespace
 
@@ -2020,6 +2026,10 @@ void AttributeChecker::visitImplementsAttr(ImplementsAttr *attr) {
                 diag::implements_attr_non_protocol_type)
       .highlight(ProtoTypeLoc.getTypeRepr()->getSourceRange());
   }
+}
+
+void AttributeChecker::visitSealedAttr(SealedAttr *attr) {
+  //TODO-ukitaka: implement
 }
 
 void TypeChecker::checkDeclAttributes(Decl *D) {

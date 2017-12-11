@@ -1370,6 +1370,14 @@ public:
   SourceLoc getStartLoc(bool forModifiers = false) const;
 };
 
+/// Represents a 'sealed' marker on a protocol declaration.
+class SealedAttr : public DeclAttribute {
+public:
+  static bool classof(const DeclAttribute *DA) {
+    return DA->getKind() == DAK_Sealed;
+  }
+};
+
 } // end namespace swift
 
 #endif

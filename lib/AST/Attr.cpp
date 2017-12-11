@@ -635,6 +635,8 @@ StringRef DeclAttribute::getAttrName() const {
     return "_specialize";
   case DAK_Implements:
     return "_implements";
+  case DAK_Sealed:
+    return "sealed";
   }
   llvm_unreachable("bad DeclAttrKind");
 }

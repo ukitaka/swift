@@ -1406,6 +1406,8 @@ namespace decls_block {
     BCFixed<2>  // optimize value
   >;
 
+  using SealedDeclAttrLayout = BCRecordLayout<Sealed_DECL_ATTR>;
+
   // Encodes a VersionTuple:
   //
   //  Major

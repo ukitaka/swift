@@ -1182,6 +1182,7 @@ bool Parser::parseNewDeclAttribute(DeclAttributes &Attributes, SourceLoc AtLoc,
       case IsInvalid:
         llvm_unreachable("handled above");
       }
+
     }
 
     if (!AnyAnnotations) {
@@ -1352,6 +1353,9 @@ bool Parser::parseNewDeclAttribute(DeclAttributes &Attributes, SourceLoc AtLoc,
       Attributes.add(Attr.get());
     }
     break;
+  }
+  case DAK_Sealed: {
+    //TODO-ukitaka: implement
   }
   }
 
