@@ -2502,6 +2502,12 @@ Parser::parseDecl(ParseDeclOptions Flags,
       break;
     }
 
+    case tok::kw_sealed: {
+      SyntaxParsingContext ModContext(SyntaxContext, SyntaxKind::DeclModifier);
+      parseNewDeclAttribute(Attributes, /*AtLoc=*/{}, DAK_Sealed);
+      continue;
+    }
+
     case tok::code_complete:
       MayNeedOverrideCompletion = true;
       DeclResult = makeParserError();
