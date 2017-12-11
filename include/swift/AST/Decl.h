@@ -3534,6 +3534,8 @@ class ProtocolDecl final : public NominalTypeDecl {
   /// The number of requirements in the requirement signature.
   unsigned NumRequirementsInSignature : 16;
 
+  bool IsSealed = false;
+
   bool requiresClassSlow();
 
   bool existentialConformsToSelfSlow();
@@ -3595,6 +3597,14 @@ public:
   void setRequiresClass(bool requiresClass = true) {
     ProtocolDeclBits.RequiresClassValid = true;
     ProtocolDeclBits.RequiresClass = requiresClass;
+  }
+
+  bool isSealed() const {
+    return IsSealed;
+  }
+
+  void setIsSealed(bool isSealed) {
+    IsSealed = isSealed;
   }
 
   /// Determine whether an existential conforming to this protocol can be
