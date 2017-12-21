@@ -4570,7 +4570,7 @@ ConstraintSystem::simplifyRestrictedConstraintImpl(
                       matchKind,
                       subflags,
                       locator.withPathElement(
-                    ConstraintLocator::PathElement::getGenericArgument(0)));
+                    LocatorPathElt::getGenericArgument(0)));
   }
 
   // K1 < K2 && V1 < V2 || K1 bridges to K2 && V1 bridges to V2 ===> 
@@ -4590,13 +4590,13 @@ ConstraintSystem::simplifyRestrictedConstraintImpl(
     // key and value types, respectively.
     auto result = matchTypes(key1, key2, subMatchKind, subflags,
                              locator.withPathElement(
-                    ConstraintLocator::PathElement::getGenericArgument(0)));
+                    LocatorPathElt::getGenericArgument(0)));
     if (result == SolutionKind::Error)
       return result;
 
     switch (matchTypes(value1, value2, subMatchKind, subflags,
                        locator.withPathElement(
-                  ConstraintLocator::PathElement::getGenericArgument(1)))) {
+                  LocatorPathElt::getGenericArgument(1)))) {
     case SolutionKind::Solved:
       return result;
 
@@ -4619,7 +4619,7 @@ ConstraintSystem::simplifyRestrictedConstraintImpl(
                       matchKind,
                       subflags,
                       locator.withPathElement(
-                    ConstraintLocator::PathElement::getGenericArgument(0)));
+                    LocatorPathElt::getGenericArgument(0)));
   }
 
   // T1 <c T2 && T2 : Hashable ===> T1 <c AnyHashable

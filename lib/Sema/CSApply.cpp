@@ -4076,7 +4076,7 @@ namespace {
         switch (auto kind = origComponent.getKind()) {
         case KeyPathExpr::Component::Kind::UnresolvedProperty: {
           auto locator = cs.getConstraintLocator(E,
-                       ConstraintLocator::PathElement::getKeyPathComponent(i));
+                       LocatorPathElt::getKeyPathComponent(i));
           auto foundDecl = getOverloadChoiceIfAvailable(locator);
           // Leave the component unresolved if the overload was not resolved.
           if (!foundDecl) {
@@ -4142,7 +4142,7 @@ namespace {
         }
         case KeyPathExpr::Component::Kind::UnresolvedSubscript: {
           auto locator = cs.getConstraintLocator(E,
-                       ConstraintLocator::PathElement::getKeyPathComponent(i));
+                       LocatorPathElt::getKeyPathComponent(i));
           auto foundDecl = getOverloadChoiceIfAvailable(locator);
           // Leave the component unresolved if the overload was not resolved.
           if (!foundDecl) {
@@ -5948,13 +5948,13 @@ buildElementConversion(ExprRewriter &rewriter,
         != CheckedCastKind::Coercion) {
     conversion = rewriter.buildObjCBridgeExpr(opaque, destType,
            locator.withPathElement(
-             ConstraintLocator::PathElement::getGenericArgument(typeArgIndex)));
+             LocatorPathElt::getGenericArgument(typeArgIndex)));
   }
 
   if (!conversion) {
     conversion = rewriter.coerceToType(opaque, destType,
            locator.withPathElement(
-             ConstraintLocator::PathElement::getGenericArgument(typeArgIndex)));
+             LocatorPathElt::getGenericArgument(typeArgIndex)));
   }
 
   return { opaque, conversion };

@@ -2820,7 +2820,7 @@ namespace {
             ? FunctionRefKind::Unapplied
             : FunctionRefKind::Compound;
           auto memberLocator = CS.getConstraintLocator(E,
-                        ConstraintLocator::PathElement::getKeyPathComponent(i));
+                        LocatorPathElt::getKeyPathComponent(i));
           CS.addValueMemberConstraint(base, lookupName,
                                       memberTy,
                                       CurDC,
@@ -2836,7 +2836,7 @@ namespace {
         case KeyPathExpr::Component::Kind::Subscript: {
 
           auto memberLocator = CS.getConstraintLocator(E,
-                        ConstraintLocator::PathElement::getKeyPathComponent(i));
+                        LocatorPathElt::getKeyPathComponent(i));
           base = addSubscriptConstraints(E, base, component.getIndexExpr(),
                                          /*decl*/ nullptr, memberLocator,
                                          /*index locator*/ memberLocator);

@@ -354,7 +354,7 @@ getAlternativeLiteralTypes(KnownProtocolKind kind) {
 
 ConstraintLocator *ConstraintSystem::getConstraintLocator(
                      Expr *anchor,
-                     ArrayRef<ConstraintLocator::PathElement> path,
+                     ArrayRef<LocatorPathElt> path,
                      unsigned summaryFlags) {
   assert(summaryFlags == ConstraintLocator::getSummaryFlagsForPath(path));
 

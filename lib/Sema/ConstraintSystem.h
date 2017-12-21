@@ -1655,7 +1655,7 @@ public:
   /// path, uniqued.
   ConstraintLocator *
   getConstraintLocator(Expr *anchor,
-                       ArrayRef<ConstraintLocator::PathElement> path,
+                       ArrayRef<LocatorPathElt> path,
                        unsigned summaryFlags);
 
   /// \brief Retrieve the constraint locator for the given anchor and
@@ -1667,7 +1667,7 @@ public:
   /// \brief Retrieve the constraint locator for the given anchor and
   /// path element.
   ConstraintLocator *
-  getConstraintLocator(Expr *anchor, ConstraintLocator::PathElement pathElt) {
+  getConstraintLocator(Expr *anchor, LocatorPathElt pathElt) {
     return getConstraintLocator(anchor, llvm::makeArrayRef(pathElt),
                                 pathElt.getNewSummaryFlags());
   }
@@ -1675,7 +1675,7 @@ public:
   /// \brief Extend the given constraint locator with a path element.
   ConstraintLocator *
   getConstraintLocator(ConstraintLocator *locator,
-                       ConstraintLocator::PathElement pathElt) {
+                       LocatorPathElt pathElt) {
     return getConstraintLocator(ConstraintLocatorBuilder(locator)
                                   .withPathElement(pathElt));
   }
